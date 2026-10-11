@@ -143,3 +143,44 @@ Une couche de compatibilite permet de tourner sur PostgreSQL sans modifier les
   champ **Request IP vide** (les IP sortantes Render gratuites sont partagees
   et variables ; une IP fixe Render coute ~100 $/mois).
 
+## Mise a jour 2026-10-11 (d) : verification retrait / crons / check depot
+
+### Check depot (`check_wallet_deposits.php`)
+- Detecte les depots **TRC20** via TronScan (API publique, sans cle) : teste OK,
+  12 depots reels detectes et signales. Repli BEP20 via RPC publics
+  (`bsc-rpc.publicnode.com`, `bsc-dataseed.binance.org`) : OK.
+- Le check **ne credite pas** le solde (anti double-credit) : il detecte, ecrit
+  dans `wallet_deposits_diag_vus` et envoie une alerte admin. Le credit vient de
+  `webhook_plisio.php` / `plisio_status.php`.
+- Execution complete en ~3-16 s, sans erreur, sur PostgreSQL.
+
+### Retrait (Mvola -> envoi USDT)
+- `retrait_mvola.php` (client) : demande, calcul des frais, tout est coherent.
+- `admin_retraits_mvola.php` (admin) : confirmation -> `plisioWithdraw()` vers
+  l'adresse Binance admin, puis code USSD Mvola affiche. La fonction gere le
+  cas ambigu (timeout) pour eviter les doubles envois.
+
+### Crons
+- `cron_update_taux.php` : OK (taux Binance 4317 -> client 4117 enregistre).
+  Protege par jeton en acces web (CLI inchange).
+- `cron_http.php` : execute `check_deposits.php` (verrou anti-concurrence).
+- **Probleme corrige** : la regle `.htaccess` `^cron_` bloquait `cron_http.php`
+  (403) ; retiree. `cron_http.php` et `log_taux_historique.php` redeviennent
+  joignables, proteges par `CRON_SECRET_TOKEN` / `CRON_SECRET`.
+- **Faille corrigee** : `hash_equals('', '')` renvoie TRUE, donc un jeton non
+  configure laissait passer un jeton vide. Tous les scripts a jeton sont
+  desormais fail-closed (verification `TOKEN === ''`).
+- `log_taux_historique.php` etait accessible publiquement : fail-closed now.
+- Cote Plisio : `plisio_status.php` est appele uniquement cote serveur (pas par
+  Plisio) -> bloque en acces web.
+
+### Cles blockchain manquantes (facultatif)
+- `TRON_API_KEY`, `MEGANODE_API_KEY`, `ANKR_API_KEY` ne sont pas configurees.
+  Le service fonctionne sans (repli TronScan + RPC publics), mais les clefs
+  apportent des limites de debit plus elevees.
+
+### Crons planifies a creer (cron-job.org)
+- `https://tango-wallet.onrender.com/wallet/cron_http.php?token=<CRON_SECRET_TOKEN>` (toutes les 2-5 min)
+- `https://tango-wallet.onrender.com/wallet/cron_update_taux.php?token=<CRON_SECRET_TOKEN>` (toutes les 30 min)
+- `https://tango-wallet.onrender.com/wallet/log_taux_historique.php?secret=<CRON_SECRET>` (toutes les 30-60 min)
+
