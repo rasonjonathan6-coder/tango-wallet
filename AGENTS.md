@@ -174,18 +174,28 @@ Une couche de compatibilite permet de tourner sur PostgreSQL sans modifier les
 - Cote Plisio : `plisio_status.php` est appele uniquement cote serveur (pas par
   Plisio) -> bloque en acces web.
 
+### TRC20 retire (2026-10-11)
+- Decision client : le reseau **TRC20 (TRON) est retire de l'application**
+  (frais Plisio jugees trop eleves). Reseau unique : **BEP20 (BNB Smart Chain)**.
+- Code : generation auto TRC20 supprimee (`portefeuille.php`), UI depots/retraits
+  TRC20 supprimee, `retrait_mvola.php` force `network=BEP20` (PHP + JS), scan
+  TRC20 (TronGrid/TronScan) retire de `check_wallet_deposits.php`,
+  `create_invoice.php` facture en `USDT_BSC`, `ADMIN_ADRESSE_BINANCE_TRC20` et
+  `TRON_API_KEY` supprimees de `blockchain_config.php`.
+- Base : `user_wallets.wallet_trc20` remis a NULL ; aucun depot TRC20 en base.
+- Page admin `wallet/admin_wallets.php` (`?page=admin_wallets`) : genere les 10
+  adresses BEP20 d'un client / de tous les clients via Plisio.
+- ⚠️ Le webhook Plisio accepte toujours les anciens `deposit_uid` numeriques
+  (utile si une ancienne adresse TRC20 est encore utilisee) : rien a changer,
+  le solde est credite par `deposit_uid` -> user_id.
+
 ### Cles blockchain (configurees 2026-10-11)
-- `TRON_API_KEY`, `MEGANODE_API_KEY`, `ANKR_API_KEY`, `BSC_API_KEY` recuperees
-  depuis le `wallet.zip` d'origine et configurees sur Render. Testees :
-  NodeReal `eth_blockNumber`/`nr_getAssetTransfers` OK, Ankr `eth_blockNumber`
-  OK, TronGrid TRC20 OK.
-- Le check depot utilise donc desormais TronGrid (cle, quota plus eleve) en
-  principal, avec repli TronScan ; BEP20 via NodeReal + Ankr + RPC publics.
+- `MEGANODE_API_KEY` (NodeReal), `ANKR_API_KEY`, `BSC_API_KEY` recuperees depuis
+  le `wallet.zip` d'origine et configurees sur Render. Testees : NodeReal
+  `eth_blockNumber`/`nr_getAssetTransfers` OK, Ankr OK.
+- `TRON_API_KEY` n'est plus utilisee (TRC20 retire).
 - ⚠️ Ces cles provenaient d'un depot public : a regenerer cote fournisseurs si
-  elles ont pu fuiter (Plisio, TronGrid, NodeReal, Ankr).
-- Rappel : le wallet du user 1 n'a pas encore d'adresse TRC20/BEP20
-  (`user_wallets.wallet_trc20` = NULL), donc le cron ne scanne rien (0 s) tant
-  qu'une adresse n'est pas attribuee.
+  elles ont pu fuiter (Plisio, NodeReal, Ankr).
 
 ### Crons planifies a creer (cron-job.org)
 - `https://tango-wallet.onrender.com/wallet/cron_http.php?token=<CRON_SECRET_TOKEN>` (toutes les 2-5 min)

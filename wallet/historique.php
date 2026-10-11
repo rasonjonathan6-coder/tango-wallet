@@ -21,7 +21,7 @@ require_once __DIR__ . "/../config.php";
 
 $user_id = $_SESSION['user_id'];
 
-// --- Dépôts USDT reçus (TRC20 / BEP20) ---
+// --- Dépôts USDT reçus (BEP20) ---
 $stmtDepots = $pdo->prepare("
     SELECT *
     FROM wallet_deposits
@@ -53,7 +53,7 @@ function soldeAfficheDepuisBrut(float $montantBrut): float {
 
 foreach ($depots as $d) {
     // Montant affiché dans l'historique = montant réel du dépôt moins le
-    // pire cas entre TRC20 et BEP20, pour être cohérent avec le montant
+    // frais BEP20, pour être cohérent avec le montant
     // affiché ailleurs (email de confirmation, solde, plafond de retrait —
     // voir portefeuille.php et retrait_mvola.php).
     $montantDepotBrut = (float)($d['montant'] ?? 0);

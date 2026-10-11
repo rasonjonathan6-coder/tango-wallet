@@ -43,9 +43,9 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirmer_id'])){
     } else {
 
         // Réseau -> devise Plisio + adresse admin correspondante
-        $network = $infoRetrait['network'] === 'BEP20' ? 'BEP20' : 'TRC20';
-        $currencePlisio = $network === 'BEP20' ? 'USDT_BSC' : 'USDT_TRX';
-        $adresseDestination = $network === 'BEP20' ? ADMIN_ADRESSE_BINANCE_BEP20 : ADMIN_ADRESSE_BINANCE_TRC20;
+        $network = 'BEP20';
+        $currencePlisio = 'USDT_BSC';
+        $adresseDestination = ADMIN_ADRESSE_BINANCE_BEP20;
 
         // Montant envoyé = montant brut demandé par le client (frais gardés séparément côté MGA)
         $montantAEnvoyer = (float)$infoRetrait['montant_usdt'];
@@ -233,7 +233,7 @@ if($isAjax){
                 'numero_mvola' => $r['numero_mvola'],
                 'statut'       => $r['statut'],
                 'created_at'   => $r['created_at'],
-                'adresse'      => $r['network'] === 'BEP20' ? ADMIN_ADRESSE_BINANCE_BEP20 : ADMIN_ADRESSE_BINANCE_TRC20,
+                'adresse'      => ADMIN_ADRESSE_BINANCE_BEP20,
             ];
         }, $retraitsAjax),
     ]);
@@ -385,7 +385,7 @@ $retraits = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </thead>
         <tbody id="corpsTableauDesktop">
         <?php foreach($retraits as $r):
-            $adresseDest = $r['network'] === 'BEP20' ? ADMIN_ADRESSE_BINANCE_BEP20 : ADMIN_ADRESSE_BINANCE_TRC20;
+            $adresseDest = ADMIN_ADRESSE_BINANCE_BEP20;
         ?>
             <tr>
                 <td>
@@ -431,7 +431,7 @@ $retraits = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <!-- ================= VUE MOBILE (CARTES) ================= -->
 <div class="mobile-view" id="corpsMobile">
     <?php foreach($retraits as $r):
-        $adresseDest = $r['network'] === 'BEP20' ? ADMIN_ADRESSE_BINANCE_BEP20 : ADMIN_ADRESSE_BINANCE_TRC20;
+        $adresseDest = ADMIN_ADRESSE_BINANCE_BEP20;
     ?>
         <div class="withdrawal-card-item">
             <div class="withdrawal-header">

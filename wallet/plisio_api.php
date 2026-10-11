@@ -11,7 +11,7 @@ require_once "plisio_config.php";
  *    dans les paramètres de la boutique Plisio, sinon l'API renvoie :
  *    {"status":"error","data":{"message":"White-label payment processing is disabled..."}}
  *
- * @param string $currency  ID Plisio de la crypto (ex: "USDT_TRX", "USDT_BSC")
+ * @param string $currency  ID Plisio de la crypto (ex: "USDT_BSC")
  * @param string $uid       Identifiant interne unique de l'utilisateur (ex: user_id)
  */
 function createPlisioWallet($currency, $uid){
@@ -54,7 +54,7 @@ function createPlisioWallet($currency, $uid){
  * des fonds), et non le montant vu sur BscScan/TronScan, qui doit servir de
  * référence avant de déclencher un envoi automatique (plisioWithdraw).
  *
- * @param string $currency  ID Plisio de la crypto (ex: "USDT_TRX", "USDT_BSC")
+ * @param string $currency  ID Plisio de la crypto (ex: "USDT_BSC")
  * @return array            ["status"=>"success","data"=>["balance"=>"4.93..."]] ou ["status"=>"error",...]
  */
 function getPlisioBalance($currency){
@@ -104,7 +104,7 @@ function getPlisioBalance($currency){
  *  - Ne jamais considérer un retrait comme "réussi" sur simple absence d'erreur réseau :
  *    toujours vérifier $result['status'] === 'success'.
  *
- * @param string $currency  ID Plisio de la crypto (ex: "USDT_TRX", "USDT_BSC")
+ * @param string $currency  ID Plisio de la crypto (ex: "USDT_BSC")
  * @param string $to        Adresse crypto de destination
  * @param float  $amount    Montant à envoyer (dans l'unité de la devise, pas en centimes)
  * @return array            Réponse décodée de l'API Plisio (ou ["error" => ...] si échec réseau)

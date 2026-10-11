@@ -1759,7 +1759,6 @@ select{
     display: inline-block; font-size: 9.5px; font-weight: 700;
     padding: 3px 8px; border-radius: 7px; margin-bottom: 6px; letter-spacing: .3px;
 }
-.network-badge.trc20 { background: rgba(255,0,80,.15); color: #ff2e6f; border: 1px solid rgba(255,0,80,.3); }
 .network-badge.bep20 { background: rgba(240,185,11,.15); color: #f0b90b; border: 1px solid rgba(240,185,11,.3); }
 .wallet-pro-addr-row {
     display: flex; align-items: center; gap: 7px;
@@ -4759,7 +4758,6 @@ body.page-dashboard-full{
         // 💰 Wallet utilisateur — valeurs à connecter à votre base de données / API.
         // Remplacez ces valeurs (solde réel, adresses de dépôt) par les vôtres.
         $wallet_solde      = 0.00;
-        $wallet_addr_trc20 = "";
         $wallet_addr_bep20 = "";
 
         // 👋 Salutation personnalisée de l'en-tête "Mon compte" : la table
@@ -5120,7 +5118,7 @@ body.page-dashboard-full{
         }
     }
 
-    // Copie une adresse (TRC20 / BEP20) à partir de son id d'input
+    // Copie une adresse (BEP20) à partir de son id d'input
     function copyWalletAddr(inputId){
         var input = document.getElementById(inputId);
         navigator.clipboard.writeText(input.value)

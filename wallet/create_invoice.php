@@ -71,7 +71,7 @@ $params = [
 
     "source_amount" => $montant,
 
-    "currency" => "USDT_TRX",
+    "currency" => "USDT_BSC",
 
     "email" => $email,
 

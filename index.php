@@ -381,11 +381,11 @@ if (isset($_GET['check_maintenance'])) {
 }
 
 // ================= PAGES LOURDES DÉLÉGUÉES AU MODULE wallet/ =================
-if (in_array($page, ['portefeuille', 'retrait_mvola', 'admin_retraits_mvola'], true)) {
-    if ($page === 'admin_retraits_mvola' && !isset($_SESSION['admin'])) {
+if (in_array($page, ['portefeuille', 'retrait_mvola', 'admin_retraits_mvola', 'admin_wallets'], true)) {
+    if (in_array($page, ['admin_retraits_mvola', 'admin_wallets'], true) && !isset($_SESSION['admin'])) {
         redirect('?page=dashboard');
     }
-    if ($page !== 'admin_retraits_mvola' && !isset($_SESSION['user_id'])) {
+    if (!in_array($page, ['admin_retraits_mvola', 'admin_wallets'], true) && !isset($_SESSION['user_id'])) {
         redirect('?page=dashboard');
     }
 
@@ -638,6 +638,7 @@ $title = $titles[$page] ?? 'Wallet';
                 <button type="submit" name="delete_push_subscriptions" class="btn danger">Supprimer les abonnements push</button>
             </form>
             <a class="btn" href="?page=admin_retraits_mvola">Gérer les retraits Mvola</a>
+            <a class="btn" href="?page=admin_wallets">Gérer les adresses de dépôt</a>
         </div>
     </div>
 

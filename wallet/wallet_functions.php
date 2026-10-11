@@ -81,7 +81,7 @@ function getWalletHistory($pdo,$wallet_id){
  * supérieur au solde Plisio puisque Plisio prélève sa propre commission dès
  * la réception des fonds.
  *
- * @param string $currency       ID Plisio (ex: "USDT_BSC", "USDT_TRX")
+ * @param string $currency       ID Plisio (ex: "USDT_BSC")
  * @param float  $margeSecurite  Marge de sécurité supplémentaire (0.0005 = 0,05%)
  *                                pour absorber les micro-écarts d'arrondi flottant.
  *                                Le vrai coussin contre la commission Plisio (~1,5%)

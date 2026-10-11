@@ -10,41 +10,27 @@ if(!isset($_SESSION['user_id'])){
 
 require_once "taux.php";
 
-// TRC20 : vrai frais Plisio (0,5% du montant, plancher 1 USDT) + marge perso de 0,5%.
-const FRAIS_RETRAIT_TAUX_TRC20     = 0.005; // 0,5% officiel Plisio
-const FRAIS_RETRAIT_PLANCHER_TRC20 = 1.0;   // Plancher Plisio (1 USDT minimum)
-const POURCENTAGE_PERSO_TRC20      = 0.005; // 0,5% marge perso TRC20
-
+// BEP20 uniquement (TRC20 retiré : frais Plisio trop élevés pour le client).
 // BEP20 : facturé à 2% (coût réel Plisio 1,6% + marge 0,4% intégrée dans le taux, pas de plancher)
 const FRAIS_RETRAIT_TAUX_BEP20 = 0.02; // 2% facturé (coût réel Plisio : 1,6%)
 const FRAIS_RETRAIT_MAX_USDT  = 20.0;
-const POURCENTAGE_PERSO_BEP20 = 0.005; // 0,5% marge perso BEP20 (inchangé)
+const POURCENTAGE_PERSO_BEP20 = 0.005; // 0,5% marge perso BEP20
 
 const MONTANT_RETRAIT_MIN_USDT = 10.0; // Montant minimum de retrait
 
-function calculerFraisRetrait(float $montantUsdt, string $network = 'TRC20'): float {
-    if ($network === 'BEP20') {
-        $frais = $montantUsdt * FRAIS_RETRAIT_TAUX_BEP20;
-        $frais = min($frais, FRAIS_RETRAIT_MAX_USDT);
-        return round($frais, 2);
-    }
-    // TRC20 : frais Plisio réel, 0,5% du montant avec un plancher de 1 USDT
-    $frais = max($montantUsdt * FRAIS_RETRAIT_TAUX_TRC20, FRAIS_RETRAIT_PLANCHER_TRC20);
+function calculerFraisRetrait(float $montantUsdt, string $network = 'BEP20'): float {
+    $frais = $montantUsdt * FRAIS_RETRAIT_TAUX_BEP20;
+    $frais = min($frais, FRAIS_RETRAIT_MAX_USDT);
     return round($frais, 2);
 }
 
-function calculerMargePerso(float $montantUsdt, string $network = 'TRC20'): float {
-    $pourcentage = ($network === 'BEP20') ? POURCENTAGE_PERSO_BEP20 : POURCENTAGE_PERSO_TRC20;
-    return round($montantUsdt * $pourcentage, 2);
+function calculerMargePerso(float $montantUsdt, string $network = 'BEP20'): float {
+    return round($montantUsdt * POURCENTAGE_PERSO_BEP20, 2);
 }
 
 // Solde net utilisable pour un réseau donné, à partir d'un montant brut donné.
 function soldeNetPourReseau(float $montantBrut, string $network): float {
-    if ($network === 'BEP20') {
-        return max(0, $montantBrut * (1 - FRAIS_RETRAIT_TAUX_BEP20 - POURCENTAGE_PERSO_BEP20));
-    }
-    $fraisTrc20 = max($montantBrut * FRAIS_RETRAIT_TAUX_TRC20, FRAIS_RETRAIT_PLANCHER_TRC20);
-    return max(0, $montantBrut - $fraisTrc20 - ($montantBrut * POURCENTAGE_PERSO_TRC20));
+    return max(0, $montantBrut * (1 - FRAIS_RETRAIT_TAUX_BEP20 - POURCENTAGE_PERSO_BEP20));
 }
 
 // Solde AFFICHÉ / plafond de retrait autorisé = solde réel moins 2,5% de
@@ -117,18 +103,15 @@ $stmtDepot = $pdo->prepare("
 ");
 $stmtDepot->execute([$user_id]);
 $reseauDetecte = (string)$stmtDepot->fetchColumn();
-// Plisio stocke le code réseau tel quel (ex: "USDT_TRX", "USDT_BSC"), pas "TRC20"/"BEP20"
-// littéralement -> on détecte via une correspondance sur "BSC"/"BEP20", pas une égalité stricte.
-$reseauParDefaut = (stripos($reseauDetecte, 'BSC') !== false || stripos($reseauDetecte, 'BEP20') !== false)
-    ? 'BEP20'
-    : 'TRC20';
+// BEP20 uniquement.
+$reseauParDefaut = 'BEP20';
 
 if($_SERVER['REQUEST_METHOD'] === 'POST'){
 
     $montantUsdt = isset($_POST['montant_usdt']) ? (float)$_POST['montant_usdt'] : 0;
     $numeroMvola = trim($_POST['numero_mvola'] ?? '');
     $nomMvola    = trim($_POST['nom_mvola'] ?? '');
-    $network     = ($_POST['network'] ?? '') === 'BEP20' ? 'BEP20' : 'TRC20';
+    $network     = 'BEP20';
 
     if($montantUsdt <= 0){
         $erreur = "Montant invalide.";
@@ -255,9 +238,7 @@ Merci de la traiter depuis l'espace admin.
 
 }
 
-// Solde AFFICHÉ = solde réel moins le pire cas entre les deux réseaux :
-// TRC20 (frais Plisio réel : 0,5% du montant, plancher 1 USDT, + 0,5% marge
-// perso) ou BEP20 (1,6% + 0,5% marge
+// Solde AFFICHÉ = solde réel moins les frais BEP20 (2% Plisio + 0,5% marge
 // perso). Le solde brut en base n'est pas modifié : seuls l'affichage et le
 // plafond de retrait en tiennent compte (cf. validations ci-dessus). Arrondi
 // vers le BAS (floor) et non au plus proche : sinon l'affichage peut montrer
@@ -743,10 +724,8 @@ $solde_usdt = number_format(floor(soldeAfficheDepuisBrut((float)($wallet['solde'
 
                 <div class="form-group">
                     <label for="network" data-fr="Réseau d'origine" data-en="Source network">Réseau d'origine</label>
-                    <select name="network" id="network">
-                        <option value="TRC20" <?= $reseauParDefaut === 'TRC20' ? 'selected' : '' ?> data-fr="TRC20 (TRON)" data-en="TRC20 (TRON)">TRC20 (TRON)</option>
-                        <option value="BEP20" <?= $reseauParDefaut === 'BEP20' ? 'selected' : '' ?> data-fr="BEP20 (Binance Smart Chain)" data-en="BEP20 (Binance Smart Chain)">BEP20 (Binance Smart Chain)</option>
-                    </select>
+                    <input type="hidden" name="network" id="network" value="BEP20">
+                    <div class="wallet-input" style="display:flex; align-items:center;" data-fr="BEP20 (Binance Smart Chain)" data-en="BEP20 (Binance Smart Chain)">BEP20 (Binance Smart Chain)</div>
                 </div>
 
                 <div class="form-group">
@@ -829,21 +808,13 @@ async function chargerTaux(){
     }
 }
 
-const FRAIS_TAUX_TRC20 = 0.005;     // 0,5% officiel Plisio
-const FRAIS_PLANCHER_TRC20 = 1.0;   // Plancher Plisio (1 USDT minimum)
-const POURCENTAGE_PERSO_TRC20 = 0.005; // 0,5% marge perso TRC20
-
 const FRAIS_TAUX_BEP20 = 0.02;  // 2% facturé (coût réel Plisio : 1,6%)
 const FRAIS_MAX = 20.0;
 const MONTANT_MIN = 10.0; // Montant minimum de retrait
-const POURCENTAGE_PERSO_BEP20 = 0.005; // 0,5% - inchangé pour BEP20
+const POURCENTAGE_PERSO_BEP20 = 0.005; // 0,5% marge perso
 
 function soldeNetPourReseau(montantBrut, network){
-    if(network === 'BEP20'){
-        return Math.max(0, montantBrut * (1 - FRAIS_TAUX_BEP20 - POURCENTAGE_PERSO_BEP20));
-    }
-    const fraisTrc20 = Math.max(montantBrut * FRAIS_TAUX_TRC20, FRAIS_PLANCHER_TRC20);
-    return Math.max(0, montantBrut - fraisTrc20 - (montantBrut * POURCENTAGE_PERSO_TRC20));
+    return Math.max(0, montantBrut * (1 - FRAIS_TAUX_BEP20 - POURCENTAGE_PERSO_BEP20));
 }
 
 // Solde affiché = solde réel moins 2,5% de frais forfaitaires, identique au
@@ -883,17 +854,13 @@ async function rafraichirSoldeRetrait(){
 setInterval(rafraichirSoldeRetrait, 5000);
 
 function calculerFrais(montant, network){
-    if(network === 'BEP20'){
-        let frais = montant * FRAIS_TAUX_BEP20;
-        frais = Math.min(frais, FRAIS_MAX);
-        return Math.round(frais * 100) / 100;
-    }
-    return Math.round(Math.max(montant * FRAIS_TAUX_TRC20, FRAIS_PLANCHER_TRC20) * 100) / 100;
+    let frais = montant * FRAIS_TAUX_BEP20;
+    frais = Math.min(frais, FRAIS_MAX);
+    return Math.round(frais * 100) / 100;
 }
 
 function calculerMargePerso(montant, network){
-    const pourcentage = network === 'BEP20' ? POURCENTAGE_PERSO_BEP20 : POURCENTAGE_PERSO_TRC20;
-    return Math.round(montant * pourcentage * 100) / 100;
+    return Math.round(montant * POURCENTAGE_PERSO_BEP20 * 100) / 100;
 }
 
 // Grille officielle Mvola : frais de transfert vers un abonné Mvola, par palier de montant (en Ariary)
@@ -942,7 +909,7 @@ function recalculer(){
     const networkSelect = document.getElementById("network");
     if(!input || tauxClient === null) return;
     const montant = parseFloat(input.value) || 0;
-    const network = networkSelect ? networkSelect.value : 'TRC20';
+    const network = networkSelect ? networkSelect.value : 'BEP20';
     const frais = montant > 0 ? calculerFrais(montant, network) : 0;
     const montantNet = Math.max(montant - frais, 0);
     const fraisPerso = montant > 0 ? calculerMargePerso(montant, network) : 0;

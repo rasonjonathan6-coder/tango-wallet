@@ -102,7 +102,6 @@ function logErreurEtEcho($message){
 
 // Contrats des tokens
 $usdtBep20Contract = "0x55d398326f99059ff775485246999027b3197955"; // USDT BEP20 - 18 décimales
-$usdtTrc20Contract = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t";         // USDT TRC20 - 6 décimales
 
 
 // récupérer les portefeuilles actifs
@@ -484,80 +483,8 @@ function recupererTransfersBep20AvecFailover($endpoints, $addressBep20, $blocBep
     return false;
 }
 
-// ---------- Repli "TronScan" pour la détection des dépôts TRC20 ----------
-// TronGrid (méthode principale) reste utilisée en premier. Si elle échoue
-// (panne, quota, clé invalide...), on se rabat sur l'API publique de
-// TronScan, qui ne nécessite pas de clé API. Les deux fonctions retournent
-// le même format normalisé : transaction_id / to / value / token_info.decimals.
+// (TRC20/TRON retiré : plus d'appel TronGrid ni TronScan — seuls les dépôts BEP20 sont scannés.)
 
-function recupererTransfersTrc20TronGrid($addressTrc20, $usdtTrc20Contract){
-
-    $url = "https://api.trongrid.io/v1/accounts/".$addressTrc20
-        ."/transactions/trc20?limit=20&contract_address=".$usdtTrc20Contract;
-
-    $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, ["TRON-PRO-API-KEY: ".TRON_API_KEY]);
-    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-
-    $reponse = curl_exec($ch);
-    curl_close($ch);
-
-    if($reponse === false){
-        return null;
-    }
-
-    $data = json_decode($reponse, true);
-
-    if(!empty($data['success']) && isset($data['data'])){
-        return $data['data']; // déjà au format transaction_id/to/value/token_info
-    }
-
-    return null;
-}
-
-function recupererTransfersTrc20TronScan($addressTrc20, $usdtTrc20Contract){
-
-    $url = "https://apilist.tronscanapi.com/api/token_trc20/transfers"
-        ."?limit=20&start=0&sort=-timestamp&count=true"
-        ."&relatedAddress=".$addressTrc20
-        ."&contract_address=".$usdtTrc20Contract;
-
-    $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-
-    $reponse = curl_exec($ch);
-    curl_close($ch);
-
-    if($reponse === false){
-        return null;
-    }
-
-    $data = json_decode($reponse, true);
-
-    if(!isset($data['token_transfers']) || !is_array($data['token_transfers'])){
-        return null;
-    }
-
-    // Normalisation au même format que TronGrid, pour réutiliser telle
-    // quelle la boucle de traitement existante plus bas.
-    $normalise = [];
-    foreach($data['token_transfers'] as $t){
-        $normalise[] = [
-            "transaction_id" => $t['transaction_id'] ?? null,
-            "to"             => $t['to_address'] ?? null,
-            "value"          => $t['quant'] ?? '0',
-            "token_info"     => [
-                "decimals" => $t['tokenInfo']['tokenDecimal'] ?? 6,
-            ],
-        ];
-    }
-
-    return $normalise;
-}
 
 
 // pour calculer manuellement fromBlock. NodeReal exige fromBlock dès que
@@ -605,7 +532,7 @@ foreach($wallets as $wallet){
 
     $user_id = $wallet['user_id'];
 
-    // Les appels RPC (BEP20 + TRC20) de l'itération précédente ont pu
+    // Les appels RPC BEP20 de l'itération précédente ont pu
     // prendre du temps : on s'assure que la connexion BDD est toujours
     // vivante avant de continuer (voir pdoAssurerConnexion ci-dessus).
     pdoAssurerConnexion($pdo);
@@ -808,63 +735,7 @@ foreach($wallets as $wallet){
     }
 
 
-    // ---------- TRC20 (TRON) ----------
-
-    $addressTrc20 = trim($wallet['wallet_trc20'] ?? '');
-
-    if($addressTrc20){
-
-        echo "Vérification TRC20 user : ".$user_id."\n";
-
-        $transfersTrc20 = recupererTransfersTrc20TronGrid($addressTrc20, $usdtTrc20Contract);
-
-        // Repli automatique : TronGrid indisponible ou en échec (panne,
-        // quota, clé invalide...). On rejoue la détection via l'API
-        // publique TronScan (pas de clé nécessaire), pour ne jamais
-        // bloquer la détection des dépôts TRC20.
-        if($transfersTrc20 === null){
-
-            logErreurEtEcho("check_wallet_deposits: repli sur TronScan pour user ".$user_id." (".$addressTrc20.")");
-
-            $transfersTrc20 = recupererTransfersTrc20TronScan($addressTrc20, $usdtTrc20Contract);
-
-        }
-
-        if($transfersTrc20 === null){
-
-            $compteurErreurs++;
-            logErreurEtEcho("check_wallet_deposits: échec de toutes les API TRC20 (TronGrid + TronScan) pour user ".$user_id." (".$addressTrc20.")");
-
-        } else {
-
-            foreach($transfersTrc20 as $tx){
-
-                $txid = $tx['transaction_id'] ?? null;
-
-                if(!$txid || deposantDejaEnregistre($pdo, $txid)){
-                    continue;
-                }
-
-                if(($tx['to'] ?? null) !== $addressTrc20){
-                    continue;
-                }
-
-                $decimals = $tx['token_info']['decimals'] ?? 6;
-                $amount = $tx['value'] / (10 ** $decimals);
-
-                if($amount <= 0){
-                    continue;
-                }
-
-                enregistrerDepot($pdo, $user_id, $txid, "TRC20", $amount);
-
-            }
-
-        }
-
-    }
-
-    // Wallet entièrement traité (BEP20 + TRC20) sans interruption anticipée :
+    // Wallet entièrement traité (BEP20) sans interruption anticipée :
     // on avance le curseur de rotation. S'il y a break avant ce point (budget
     // de temps atteint), ce wallet reste "non complété" et sera repris depuis
     // son début au prochain tour.
@@ -892,7 +763,7 @@ echo "Terminé";
 
 // ---------- Alerte admin en cas d'erreurs répétées ----------
 // Si trop d'erreurs se sont accumulées pendant l'exécution (ex: NodeReal ET
-// les RPC de secours en panne, API TRC20 indisponible...), on prévient
+// les RPC de secours en panne...), on prévient
 // automatiquement l'admin par email plutôt que d'attendre qu'un client
 // signale que son solde n'est pas arrivé.
 // Anti-spam : un seul email au maximum par heure, via un fichier local qui
@@ -919,7 +790,7 @@ Dépôts crédités durant cette exécution : ".$compteurDepots."
 
 Vérifie les logs du serveur (error_log) pour le détail : cela peut venir
 d'une panne NodeReal + RPC de secours (Ankr / BNB Chain public), ou de
-l'API TRC20 (Tron), ou d'un autre problème réseau/serveur.
+un RPC indisponible, ou d'un autre problème réseau/serveur.
 ";
 
         sendMail(

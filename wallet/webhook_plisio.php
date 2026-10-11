@@ -16,7 +16,7 @@ require_once "plisio_config.php";
 /**
  * Extrait le user_id "réel" à partir de la valeur deposit_uid renvoyée par Plisio,
  * qu'elle soit :
- *  - déjà numérique (ex: "123")        -> dépôt TRC20 (uid = user_id brut)
+*  - déjà numérique (ex: "123")        -> dépôt (uid = user_id brut)
  *  - composite (ex: "123-bep20-5")     -> dépôt BEP20 (uid = user_id-bep20-slot)
  */
 function extraireUserIdReel($valeurBrute){

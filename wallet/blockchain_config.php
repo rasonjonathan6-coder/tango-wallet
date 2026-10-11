@@ -1,11 +1,8 @@
 <?php
 
-// API Tron (TRC20)
-define(
-    "TRON_API_KEY",
-    getenv('TRON_API_KEY') ?: ''
-);
-
+// TRC20 (TRON) retiré de l'application : frais Plisio trop élevés.
+// Réseau unique désormais : BEP20 (BNB Smart Chain).
+// (TRON_API_KEY volontairement supprimée — plus aucun code ne l'utilise.)
 
 // API BSC (BEP20) - HISTORIQUE : BscScan V1 -> Etherscan V2 (chainid=56).
 // Etherscan a ensuite retiré l'accès gratuit à BSC (juillet 2026), rendant
@@ -26,7 +23,7 @@ define(
 
 // Adresse email qui reçoit une alerte automatique quand check_wallet_deposits.php
 // rencontre trop d'erreurs lors d'une exécution (ex: tous les RPC BEP20 en
-// panne, API TRC20 indisponible...).
+// panne, service indisponible...).
 define(
     "ADMIN_ALERT_EMAIL",
     "customerservicefor032@gmail.com"
@@ -57,13 +54,9 @@ define(
 );
 
 
-// Adresses Binance de l'admin, o? envoyer manuellement l'USDT
-// lors du traitement d'un retrait Mvola (voir admin_retraits_mvola.php)
-define(
-    "ADMIN_ADRESSE_BINANCE_TRC20",
-    "TJwEQxE5P7QV4wVnSBFQR9YU2E11UdToJy"
-);
-
+// Adresse Binance de l'admin, où envoyer manuellement l'USDT
+// lors du traitement d'un retrait Mvola (voir admin_retraits_mvola.php).
+// BEP20 uniquement (TRC20 retiré).
 define(
     "ADMIN_ADRESSE_BINANCE_BEP20",
     "0x1051f25d00c316acc58dffd89078e23fdbe64de6"

@@ -51,20 +51,7 @@ if (!$wallet) {
     $wallet = $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
-// Créer adresse TRC20 via Plisio
-if (empty($wallet['wallet_trc20'])) {
-    $result = createPlisioWallet("USDT_TRX", $user_id);
-    if (isset($result['data']['hash'])) {
-        $stmt = $pdo->prepare("
-            UPDATE user_wallets
-            SET wallet_trc20 = ?
-            WHERE user_id = ?
-        ");
-        $stmt->execute([$result['data']['hash'], $user_id]);
-    } elseif (isset($result['data']['message'])) {
-        error_log("Plisio createPlisioWallet TRC20 échec user_id=" . $user_id . " : " . $result['data']['message']);
-    }
-}
+// TRC20 supprimé : uniquement des adresses BEP20 (frais Plisio TRC20 trop élevés).
 
 // Créer (si besoin) les 10 adresses BEP20 de l'utilisateur
 $bep20Addresses = ensureUserBep20Addresses($pdo, $user_id, 10);
@@ -513,17 +500,14 @@ $coursCarte = $tauxAffiche > 0
     .wallet-address-section {
         display: none;
     }
-    #radioTrc20:checked ~ #section-trc20,
     #radioBep20:checked ~ #section-bep20 {
         display: block;
     }
-    #radioTrc20:checked ~ .wallet-network-cards #btnToggleTrc20,
     #radioBep20:checked ~ .wallet-network-cards #btnToggleBep20 {
         background: rgba(255, 46, 166, 0.12);
         border-color: #ff2ea6;
         box-shadow: 0 8px 25px rgba(255, 0, 130, 0.25);
     }
-    #radioTrc20:checked ~ .wallet-network-cards #btnToggleTrc20 .wallet-network-arrow,
     #radioBep20:checked ~ .wallet-network-cards #btnToggleBep20 .wallet-network-arrow {
         transform: rotate(180deg);
         color: #ff2ea6;
@@ -565,7 +549,6 @@ $coursCarte = $tauxAffiche > 0
        plein écran + Retour), au lieu de l'accordéon "cartes + adresse
        ensemble" utilisé en navigateur classique. Piloté uniquement par la
        classe "webview-mode" posée en JS très tôt dans le <head>. === */
-    html.webview-mode #radioTrc20:checked ~ .wallet-network-cards,
     html.webview-mode #radioBep20:checked ~ .wallet-network-cards {
         display: none;
     }
@@ -611,7 +594,7 @@ $coursCarte = $tauxAffiche > 0
         padding-bottom: 40px;
     }
 
-    /* --- Sur la box "Dépôt USDT" (adresses TRC20 / Tango Live BEP20), en
+    /* --- Sur la box "Dépôt USDT" (adresses Tango Live BEP20), en
        mode WebView : le scroll natif de la page entière (fix ci-dessus)
        reste actif — c'est ce qui est fiable sur WebView Android/iOS.
        Par contre l'en-tête et, sous "📍 Retrait Tango Live", le bouton
@@ -655,7 +638,6 @@ $coursCarte = $tauxAffiche > 0
         font-size: 20px;
         font-weight: bold;
     }
-    .wallet-network-icon.trc20 { background: linear-gradient(135deg, #ff0055, #ff5500); color: #fff; }
     .wallet-network-icon.bep20 { background: linear-gradient(135deg, #f3ba2f, #f08c00); color: #fff; }
 
     .wallet-network-left h3 {
@@ -1405,7 +1387,7 @@ $coursCarte = $tauxAffiche > 0
             <div class="balance-bottom-row">
                 <span class="balance-network-badge">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    <span data-fr="Réseau TRC20 • BEP20" data-en="TRC20 • BEP20 Network">Réseau TRC20 • BEP20</span>
+                    <span data-fr="Réseau BEP20" data-en="BEP20 Network">Réseau BEP20</span>
                 </span>
                 <div style="text-align:right;">
                     <svg class="balance-chart" id="courbeTauxSvg" viewBox="0 0 90 30" preserveAspectRatio="none">
@@ -1514,22 +1496,9 @@ $coursCarte = $tauxAffiche > 0
                  sur les WebView Android/iOS où le display:none->block piloté
                  par script ne se repeint pas toujours correctement). -->
             <input type="radio" name="depotReseau" id="radioNone" class="wallet-network-radio" checked>
-            <input type="radio" name="depotReseau" id="radioTrc20" class="wallet-network-radio">
             <input type="radio" name="depotReseau" id="radioBep20" class="wallet-network-radio">
 
             <div class="wallet-network-cards">
-
-                <!-- Option TRC20 -->
-                <label class="wallet-network-card" for="radioTrc20" id="btnToggleTrc20">
-                    <div class="wallet-network-left">
-                        <div class="wallet-network-icon trc20">₮</div>
-                        <div>
-                            <h3 data-fr="USDT TRC20" data-en="USDT TRC20">USDT TRC20</h3>
-                            <p data-fr="Retrait Coomeet • Mako • Bigo" data-en="Coomeet • Mako • Bigo withdrawal">Retrait Coomeet • Mako • Bigo</p>
-                        </div>
-                    </div>
-                    <div class="wallet-network-arrow">▼</div>
-                </label>
 
                 <!-- Option BEP20 -->
                 <label class="wallet-network-card" for="radioBep20" id="btnToggleBep20">
@@ -1543,41 +1512,6 @@ $coursCarte = $tauxAffiche > 0
                     <div class="wallet-network-arrow">▼</div>
                 </label>
 
-            </div>
-
-            <!-- SECTION DEPLIABLE : TRC20 -->
-            <div id="section-trc20" class="wallet-address-section">
-                <div class="wallet-address-sticky-top">
-                    <label for="radioNone" class="wallet-retour-reseau">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-                        <span data-fr="Retour au choix du réseau" data-en="Back to network choice">Retour au choix du réseau</span>
-                    </label>
-                    <p class="wallet-mini-title" data-fr="📍 Retrait Coomeet • Mako • Bigo (Réseau TRON)" data-en="📍 Coomeet • Mako • Bigo withdrawal (TRON Network)">📍 Retrait Coomeet • Mako • Bigo (Réseau TRON)</p>
-                </div>
-
-                <div class="wallet-address-card">
-                    <div class="wallet-address-top">
-                        <div class="wallet-network-icon trc20" style="width:30px; height:30px; font-size:14px;">₮</div>
-                        <div>
-                            <h3 data-fr="Adresse USDT TRC20" data-en="USDT TRC20 Address">Adresse USDT TRC20</h3>
-                            <span data-fr="Réseau Officiel TRON" data-en="Official TRON Network">Réseau Officiel TRON</span>
-                        </div>
-                    </div>
-
-                    <?php if (!empty($wallet['wallet_trc20'])): ?>
-                        <div class="wallet-qr">
-                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=<?= urlencode($wallet['wallet_trc20']); ?>" alt="QR Code TRC20">
-                        </div>
-                    <?php endif; ?>
-
-                    <div class="wallet-address-box">
-                        <input readonly id="trc20" class="wallet-input" value="<?= htmlspecialchars($wallet['wallet_trc20'] ?? ''); ?>" data-fr-placeholder="Adresse en cours de génération..." data-en-placeholder="Address being generated..." placeholder="Adresse en cours de génération...">
-                    </div>
-
-                    <button type="button" class="wallet-copy-button" onclick="copierAdresse('trc20', this)">
-                        📋 <span data-fr="Copier l'adresse TRC20" data-en="Copy TRC20 address">Copier l'adresse TRC20</span>
-                    </button>
-                </div>
             </div>
 
             <!-- SECTION DEPLIABLE : BEP20 -->
@@ -1677,8 +1611,8 @@ $coursCarte = $tauxAffiche > 0
     });
 })();
 
-// L'ouverture/fermeture des sections TRC20/BEP20 est désormais gérée en
-// CSS pur (voir #radioTrc20/#radioBep20 + sélecteurs :checked dans le
+// L'ouverture/fermeture de la section BEP20 est désormais gérée en
+// CSS pur (voir #radioBep20 + sélecteurs :checked dans le
 // <style>), donc plus aucun JS n'est nécessaire ici — ce qui élimine
 // définitivement les soucis de repaint WebView sur cet accordéon.
 
@@ -1981,7 +1915,7 @@ function ouvrirDepot(){
     // 🩹 Sur certaines WebView, history.pushState()/history.back() ne se
     // comportent pas comme dans un vrai navigateur : au lieu de changer
     // juste l'état interne (popstate), ça déclenche un VRAI rechargement
-    // de la page — ce qui réinitialise tout, y compris le réseau TRC20/
+    // de la page — ce qui réinitialise tout, y compris le réseau
     // BEP20 déjà choisi (d'où le "ça revient tout le temps au choix du
     // réseau"). On désactive donc ce hook uniquement en mode WebView : le
     // bouton ✕ / "Retour" suffit largement à fermer la fenêtre dans l'app.
@@ -2007,26 +1941,24 @@ function fermerDepot(){
     }
 }
 
-// --- Mémorisation du réseau (TRC20/BEP20) choisi dans "Dépôt USDT" ---
-// Filet de sécurité indépendant du souci ci-dessus : même si la page se
-// recharge pour une autre raison, le dernier réseau choisi est restauré
-// automatiquement à la réouverture, le temps de l'onglet/session (WebView
-// incluse).
+// --- Mémorisation du réseau choisi dans "Dépôt USDT" ---
+// (un seul réseau désormais : BEP20 ; le filet de sécurité reste en place
+// pour le bouton "Retour" du mode WebView)
 (function(){
     const CLE_RESEAU_DEPOT = 'depotReseauChoisi';
 
     function restaurerReseauDepot(){
         try{
             const choix = sessionStorage.getItem(CLE_RESEAU_DEPOT);
-            if(choix === 'trc20' || choix === 'bep20'){
-                const radio = document.getElementById(choix === 'trc20' ? 'radioTrc20' : 'radioBep20');
+            if(choix === 'bep20'){
+                const radio = document.getElementById('radioBep20');
                 if(radio) radio.checked = true;
             }
         } catch(e) {}
     }
 
     function ecouterChoixReseauDepot(){
-        ['radioTrc20', 'radioBep20', 'radioNone'].forEach(function(id){
+        ['radioBep20', 'radioNone'].forEach(function(id){
             const radio = document.getElementById(id);
             if(!radio) return;
             radio.addEventListener('change', function(){
@@ -2035,7 +1967,7 @@ function fermerDepot(){
                     if(id === 'radioNone'){
                         sessionStorage.removeItem(CLE_RESEAU_DEPOT);
                     } else {
-                        sessionStorage.setItem(CLE_RESEAU_DEPOT, id === 'radioTrc20' ? 'trc20' : 'bep20');
+                        sessionStorage.setItem(CLE_RESEAU_DEPOT, 'bep20');
                     }
                 } catch(e) {}
             });
