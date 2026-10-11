@@ -1,0 +1,11 @@
+{
+  "name": "Wallet",
+  "short_name": "Wallet",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b1020",
+  "theme_color": "#4f7cff",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }
+  ]
+}

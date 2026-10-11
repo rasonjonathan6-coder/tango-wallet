@@ -1,0 +1,3 @@
+/* Styles additionnels du module wallet (les pages embarquent aussi leur CSS inline). */
+.mobile-view{display:none;}
+@media(max-width:768px){.mobile-view{display:block;}.desktop-view{display:none;}}

@@ -1,0 +1,11 @@
+# Dépendances / secrets locaux
+.env
+
+# Logs applicatifs
+wallet-mails.log
+webhook_plisio_diag.log
+*.log
+
+# Divers
+.DS_Store
+Thumbs.db

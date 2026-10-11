@@ -1,0 +1,50 @@
+# ============================================================================
+# Démarrage complet de l'application Wallet :
+#   docker compose up -d
+#   -> application : http://localhost:8080
+#   -> base de données MariaDB initialisée avec schema.sql au 1er démarrage
+# ============================================================================
+services:
+  db:
+    image: mariadb:11
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: wallet
+      MARIADB_USER: wallet
+      MARIADB_PASSWORD: wallet
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  app:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:80"
+    environment:
+      DB_HOST: db
+      DB_PORT: "3306"
+      DB_NAME: wallet
+      DB_USER: wallet
+      DB_PASS: wallet
+      ADMIN_PASSWORD: admin
+      CRYPTO_KEY: changez-moi-cle-de-chiffrement
+      # Renseignez les clés suivantes selon vos besoins :
+      PLISIO_SECRET_KEY: ""
+      TRON_API_KEY: ""
+      MEGANODE_API_KEY: ""
+      ANKR_API_KEY: ""
+      CRON_SECRET_TOKEN: ""
+      DIAG_SECRET_TOKEN: ""
+    volumes:
+      - ./:/var/www/html
+
+volumes:
+  db_data:
