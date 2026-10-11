@@ -76,7 +76,39 @@ find . -name "*.php" -print0 | xargs -0 -n1 php -l
 - Webhook `wallet/webhook_plisio.php` : HMAC sha1 (ksort + serialize des POST), idempotent (txid), credite `user_wallets.solde`.
 
 ### Depot GitHub
-- Depot : `rasonjonathan6-coder/tango-wallet` (prive, branche `main`).
+- Depot : `rasonjonathan6-coder/tango-wallet` (public depuis 2026-10-11, branche `main`).
 - Release `v1.0.0` contient l'APK `tango-wallet-v1.0.0.apk`.
 - Code source Android dans `android-app/` (package `com.tango.wallet`).
 - `deploy.sh` : installation VPS automatique (Apache, PHP 8.2, MariaDB, HTTPS, crons).
+
+## Mise a jour 2026-10-11 : portage PostgreSQL + Render
+
+L'app est ecrite pour MySQL ; Render ne propose pas de MySQL manage gratuit.
+Une couche de compatibilite permet de tourner sur PostgreSQL sans modifier les
+200+ requetes du code.
+
+### Portabilite base de donnees
+- `wallet/db.php` : classe `WalletPDO` (sous-classe de PDO) qui, en mode pgsql,
+  traduit `INSERT IGNORE` -> `ON CONFLICT DO NOTHING`, `ON DUPLICATE KEY UPDATE`
+  -> `ON CONFLICT (<1re colonne>) DO UPDATE SET ... EXCLUDED`, et neutralise les
+  `CREATE TABLE` MySQL (le schema vient de `schema_pg.sql`).
+- `schema_pg.sql` : 19 tables, genere depuis `schema.sql` par
+  `tools/make_pg_schema.py`. Importe automatiquement au 1er demarrage si vide.
+- `config.php` : accepte `DB_DRIVER` (mysql|pgsql) et `DB_URL` (chaine complete,
+  prioritaire, deduit le pilote). Defaut inchange = MySQL, zero regression.
+- Tests de non-regression MySQL OK, tests PostgreSQL OK (`tools/test_pg.php`).
+
+### Render
+- Dockerfile : PHP 8.2 + Apache, extensions `pdo_mysql`, `pdo_pgsql` (necessite
+  `libpq-dev`), `curl`, `mbstring`.
+- Service web : `tango-wallet` -> https://tango-wallet.onrender.com
+  (id `srv-db5l3rbbc2fs7399arlg`, plan free, region frankfurt, Docker).
+- Base : projet Supabase dedie `tango-wallet` (ref `bwnnfemkyakgnjbnakja`,
+  eu-central-1) — gratuite et permanente (le Postgres Render gratuit expire en
+  30 j). Chaine de connexion dans la variable `DB_URL` (pooler port 5432).
+- Variables Render : `APP_ENV=production`, `DB_DRIVER=pgsql`, `DB_URL`,
+  `ADMIN_PASSWORD`, `CRYPTO_KEY`, `CALLBACK_BASE_URL`.
+- Le depot GitHub `tango-wallet` est passe en **public** pour que Render puisse
+  le deployer (Render ne voit pas les depots prives sans autorisation de l'app).
+- Guide : `RENDER.md`.
+
