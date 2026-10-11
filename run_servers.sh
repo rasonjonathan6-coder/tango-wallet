@@ -37,5 +37,13 @@ while true; do
         echo "$(date '+%F %T') - boucle taux relancee"
     fi
 
+    # Tunnel Cloudflare (domaine public gratuit) : relance s'il tombe.
+    # L'URL change a chaque relance -> voir /tmp/cf.log.
+    if [ -x /tmp/cloudflared ] && ! pgrep -f "cloudflared tunnel --url" >/dev/null 2>&1; then
+        nohup /tmp/cloudflared tunnel --url http://localhost:12001 --no-autoupdate \
+            > /tmp/cf.log 2>&1 &
+        echo "$(date '+%F %T') - tunnel cloudflared relance"
+    fi
+
     sleep 30
 done
