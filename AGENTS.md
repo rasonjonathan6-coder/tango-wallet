@@ -1,26 +1,26 @@
 # AGENTS.md
 
-Mémoire projet pour les agents. Application **Wallet** (PHP + MySQL) de gestion
+MÃĐmoire projet pour les agents. Application **Wallet** (PHP + MySQL) de gestion
 de portefeuille crypto.
 
 ## Lancer l'application
 
 ```bash
-# Base de données (MariaDB/MySQL) puis schéma
+# Base de donnÃĐes (MariaDB/MySQL) puis schÃĐma
 mysql -u root -e "CREATE DATABASE IF NOT EXISTS wallet CHARACTER SET utf8mb4;"
 mysql -u root wallet < schema.sql
 
 # Variables d'environnement
 cp .env.example .env      # renseigner DB_*, ADMIN_PASSWORD, CRYPTO_KEY...
 
-# Serveur de développement
+# Serveur de dÃĐveloppement
 export $(grep -v '^#' .env | xargs)
 php -S localhost:8000
 ```
 
 Ou : `docker compose up -d` (application sur http://localhost:8080).
 
-## Vérifications rapides
+## VÃĐrifications rapides
 
 ```bash
 # Syntaxe de tous les fichiers PHP
@@ -29,32 +29,32 @@ find . -name "*.php" -print0 | xargs -0 -n1 php -l
 
 ## Points d'architecture
 
-- `index.php` (racine) est le contrôleur frontal : authentification, inscription,
-  espace admin, support. Il délègue les pages lourdes au module `wallet/`.
-- Le verrou admin global (écran « Accès restreint ») a été **retiré** le
+- `index.php` (racine) est le contrÃīleur frontal : authentification, inscription,
+  espace admin, support. Il dÃĐlÃĻgue les pages lourdes au module `wallet/`.
+- Le verrou admin global (ÃĐcran ÂŦ AccÃĻs restreint Âŧ) a ÃĐtÃĐ **retirÃĐ** le
   2026-10-11 : la racine `/` affiche la connexion utilisateur. L'espace admin
-  reste protégé par une page de connexion dédiée sur `/?page=admin`.
+  reste protÃĐgÃĐ par une page de connexion dÃĐdiÃĐe sur `/?page=admin`.
 - `wallet/` est le module d'origine (portefeuille, retrait Mvola, crons,
-  diagnostics). Ses fichiers se chargent entre eux par leur nom grâce au
-  `set_include_path()` défini dans `index.php`.
+  diagnostics). Ses fichiers se chargent entre eux par leur nom grÃĒce au
+  `set_include_path()` dÃĐfini dans `index.php`.
 - `wallet/config.php` et `plisio_config.php` (racine) sont des shims pour les
   `require` relatifs du module.
-- Les vues du module (`portefeuille.php`, `retrait_mvola.php`) émettent leur
-  propre document HTML complet ; elles ne doivent pas être incluses dans le
+- Les vues du module (`portefeuille.php`, `retrait_mvola.php`) ÃĐmettent leur
+  propre document HTML complet ; elles ne doivent pas ÃŠtre incluses dans le
   gabarit de `index.php`.
 
-## Conventions de sécurité
+## Conventions de sÃĐcuritÃĐ
 
-- **Aucun secret en dur.** Toutes les clés (Plisio, Tron, MegaNode, Ankr, tokens
+- **Aucun secret en dur.** Toutes les clÃĐs (Plisio, Tron, MegaNode, Ankr, tokens
   cron/diag) et identifiants passent par des variables d'environnement
-  (`getenv()`), documentées dans `.env.example`.
+  (`getenv()`), documentÃĐes dans `.env.example`.
 - Ne jamais committer `.env`, ni les fichiers `*.log`.
 
 ## Mise a jour 2026-10-11 : UI, Google, taux, Android
 
 ### Hebergement
 - Port 12000 : base `wallet` (historique).
-- Port 12001 : base `wallet_android` (dediee Android) — env dans `/tmp/wallet_android_env.sh` (hors git).
+- Port 12001 : base `wallet_android` (dediee Android) â env dans `/tmp/wallet_android_env.sh` (hors git).
 - Utilisateur MariaDB `walletapp` / base `wallet_android`, accessible en TCP.
 
 ### APK Android (WebView)
@@ -107,7 +107,7 @@ Une couche de compatibilite permet de tourner sur PostgreSQL sans modifier les
 - Service web : `tango-wallet` -> https://tango-wallet.onrender.com
   (id `srv-db5l3rbbc2fs7399arlg`, plan free, region frankfurt, Docker).
 - Base : projet Supabase dedie `tango-wallet` (ref `bwnnfemkyakgnjbnakja`,
-  eu-central-1) — gratuite et permanente (le Postgres Render gratuit expire en
+  eu-central-1) â gratuite et permanente (le Postgres Render gratuit expire en
   30 j). Chaine de connexion dans la variable `DB_URL` (pooler port 5432).
 - Variables Render : `APP_ENV=production`, `DB_DRIVER=pgsql`, `DB_URL`,
   `ADMIN_PASSWORD`, `CRYPTO_KEY`, `CALLBACK_BASE_URL`.
@@ -198,7 +198,7 @@ Une couche de compatibilite permet de tourner sur PostgreSQL sans modifier les
     9 visites -> 10 adresses distinctes.
   - Idempotent, ne fait jamais echouer une inscription (echecs Plisio journalises).
   - Generation forcee des 10 d'un coup : page admin `?page=admin_wallets`.
-- ⚠️ Le webhook Plisio accepte toujours les anciens `deposit_uid` numeriques
+- â ïļ Le webhook Plisio accepte toujours les anciens `deposit_uid` numeriques
   (utile si une ancienne adresse TRC20 est encore utilisee) : rien a changer,
   le solde est credite par `deposit_uid` -> user_id.
 
@@ -209,8 +209,8 @@ Une couche de compatibilite permet de tourner sur PostgreSQL sans modifier les
   adresses, retraits). `.htaccess` le bloque desormais, ainsi que
   `check_deposits.php` / `check_bep20.php` / `check_trc20.php`, `get_solde.php`,
   `admin_retraits_1mvola.php`, `retrait_mvola1.php` et tous les fichiers
-  « nom (1).php ».
-- Fichiers supprimes (doublons / obsolètes, aucun n'etait route) :
+  ÂŦ nom (1).php Âŧ.
+- Fichiers supprimes (doublons / obsolÃĻtes, aucun n'etait route) :
   `wallet/check_wallet_deposits(1).php`, `historique(1).php`,
   `view_webhook_log(1).php`, `webhook_plisio_diag(1).php`,
   `diag_deposit .php` (espace), `retrait_mvola 20.php` (espace),
@@ -218,14 +218,14 @@ Une couche de compatibilite permet de tourner sur PostgreSQL sans modifier les
   `retrait_mvola1.php`, `admin_retraits_1mvola.php`.
 - `cron_http.php` pointe directement sur `check_wallet_deposits.php`.
 - Le blocage `.htaccess` n'affecte PAS les `require` serveur : le cron
-  fonctionne toujours (verifie en live : « Termine »).
+  fonctionne toujours (verifie en live : ÂŦ Termine Âŧ).
 
 ### Cles blockchain (configurees 2026-10-11)
 - `MEGANODE_API_KEY` (NodeReal), `ANKR_API_KEY`, `BSC_API_KEY` recuperees depuis
   le `wallet.zip` d'origine et configurees sur Render. Testees : NodeReal
   `eth_blockNumber`/`nr_getAssetTransfers` OK, Ankr OK.
 - `TRON_API_KEY` n'est plus utilisee (TRC20 retire).
-- ⚠️ Ces cles provenaient d'un depot public : a regenerer cote fournisseurs si
+- â ïļ Ces cles provenaient d'un depot public : a regenerer cote fournisseurs si
   elles ont pu fuiter (Plisio, NodeReal, Ankr).
 
 ### Crons planifies a creer (cron-job.org)
@@ -233,7 +233,7 @@ Une couche de compatibilite permet de tourner sur PostgreSQL sans modifier les
 - `https://tango-wallet.onrender.com/wallet/cron_update_taux.php?token=<CRON_SECRET_TOKEN>` (toutes les 30 min)
 - `https://tango-wallet.onrender.com/wallet/log_taux_historique.php?secret=<CRON_SECRET>` (toutes les 30-60 min)
 
-## Design system de l'interface (« Aurora », 2026)
+## Design system de l'interface (ÂŦ Aurora Âŧ, 2026)
 - Feuille de style maitresse : `admin_style.css` (racine), chargee par
   `index.php`, `verify.php`, `go.php` et les pages `wallet/admin_*.php`.
 - Jetons CSS dans `:root` : `--bg`, `--surface`, `--border`, `--primary`
@@ -246,10 +246,23 @@ Une couche de compatibilite permet de tourner sur PostgreSQL sans modifier les
 - Barre de navigation mobile `.tabbar` : visible <= 640px, affichee dans
   `index.php` quand `$_SESSION['user_id']` est defini (classe `has-tabbar`).
 - `wallet/portefeuille.php` possede son CSS inline (glassmorphism) + un bloc
-  final « Harmonisation Aurora » qui aligne la palette sur indigo/violet
+  final ÂŦ Harmonisation Aurora Âŧ qui aligne la palette sur indigo/violet
   (bordure animee adoucie, carte solde, actions, cours, bottom-nav).
 - Palette : indigo/violet pour les actions, menthe/vert pour les valeurs
   positives et les depots. Evite le rose flashy `#ff2ea6` pour l'UI chrome.
 - Les libelles de formulaire utilisent `<label for>` + `autocomplete` (pas
   seulement des placeholders).
+
+## Deploiement Render
+- Service : `tango-wallet` — id `srv-db5l3rbbc2fs7399arlg` (region Frankfurt,
+  runtime Docker, branche `main`, autoDeploy actif).
+- Declencher un build via l'API (token Render `rnd_...`, a garder hors depot) :
+  ```bash
+  curl -X POST -H "Authorization: Bearer $RENDER_API_KEY" \
+    -H "Content-Type: application/json" \
+    https://api.render.com/v1/services/srv-db5l3rbbc2fs7399arlg/deploys \
+    -d '{"clearCache":"do_not_clear"}'
+  ```
+  Puis suivre `.../deploys/<id>` jusqu'a `status=live`.
+- Rappel : le service gratuit s'endort apres 15 min d'inactivite (1er appel lent).
 
