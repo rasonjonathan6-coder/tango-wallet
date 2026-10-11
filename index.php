@@ -208,6 +208,81 @@ if (isset($_POST['ajouter'])) {
     }
 }
 
+// ================= CONNEXION AVEC GOOGLE =================
+// L'adresse e-mail Google (vérifiée par Google) devient l'identifiant du compte :
+// elle sert à savoir à qui appartient chaque portefeuille/adresse crypto.
+if ($page === 'google_callback') {
+    if (!isset($_GET['code']) || $google_client_id === '' || $google_client_secret === '') {
+        $error_login = "Connexion Google indisponible (configuration manquante).";
+        $page = 'dashboard';
+    } else {
+        $ch = curl_init('https://oauth2.googleapis.com/token');
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query([
+            'code'          => $_GET['code'],
+            'client_id'     => $google_client_id,
+            'client_secret' => $google_client_secret,
+            'redirect_uri'  => $google_redirect_uri,
+            'grant_type'    => 'authorization_code',
+        ]));
+        $token_data = json_decode(curl_exec($ch), true);
+        curl_close($ch);
+
+        $google_user = null;
+        if (!empty($token_data['access_token'])) {
+            $ch = curl_init('https://www.googleapis.com/oauth2/v3/userinfo');
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, ['Authorization: Bearer ' . $token_data['access_token']]);
+            $google_user = json_decode(curl_exec($ch), true);
+            curl_close($ch);
+        }
+
+        if (empty($google_user['email'])) {
+            $error_login = "Échec de l'authentification Google. Réessayez.";
+            $page = 'dashboard';
+        } else {
+            $google_id    = $google_user['sub'];
+            $google_email = $google_user['email'];
+
+            $stmt = $pdo->prepare("SELECT * FROM users WHERE google_id = ?");
+            $stmt->execute([$google_id]);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$user) {
+                $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
+                $stmt->execute([$google_email]);
+                $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                if ($user) {
+                    $pdo->prepare("UPDATE users SET verified = 1, google_id = ? WHERE id = ?")
+                        ->execute([$google_id, $user['id']]);
+                } else {
+                    $insert = $pdo->prepare("INSERT INTO users (email, password, verified, google_id, created_at) VALUES (?, ?, 1, ?, ?)");
+                    $insert->execute([$google_email, password_hash(bin2hex(random_bytes(16)), PASSWORD_DEFAULT), $google_id, date('Y-m-d H:i:s')]);
+                    $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
+                    $stmt->execute([$pdo->lastInsertId()]);
+                    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+                }
+            }
+
+            if ($user) {
+                session_regenerate_id(true);
+                $_SESSION['user_id'] = (int) $user['id'];
+                $_SESSION['pending_identifiant'] = $user['email'];
+                $_SESSION['connexion_google'] = true;
+                unset($_SESSION['pending_mdp_crypte']);
+                redirect('?page=compte');
+            }
+
+            $error_login = "Impossible de créer le compte Google.";
+            $page = 'dashboard';
+        }
+    }
+}
+
 // ================= MOT DE PASSE OUBLIÉ =================
 if (isset($_POST['send_otp'])) {
     $email = trim($_POST['email_reset'] ?? '');
@@ -408,6 +483,11 @@ $title = $titles[$page] ?? 'Wallet';
 
 <?php if ($page === 'dashboard'): ?>
     <div class="card center">
+        <div class="hero-brand">
+            <div class="hero-logo">💼</div>
+            <div class="hero-title">Tango Wallet</div>
+            <div class="hero-sub">Portefeuille crypto · Madagascar</div>
+        </div>
         <h2>Connexion</h2>
         <form method="POST" class="form">
             <input type="text" name="identifiant" placeholder="Email" required autocomplete="off">
@@ -415,6 +495,24 @@ $title = $titles[$page] ?? 'Wallet';
             <label class="check"><input type="checkbox" name="remember_me"> Se souvenir de moi</label>
             <button type="submit" name="ajouter" class="btn">Se connecter</button>
         </form>
+
+        <?php if ($google_client_id !== ''): ?>
+            <div class="sep">ou</div>
+            <?php
+                $google_auth_url = 'https://accounts.google.com/o/oauth2/v2/auth?' . http_build_query([
+                    'client_id'     => $google_client_id,
+                    'redirect_uri'  => $google_redirect_uri,
+                    'response_type' => 'code',
+                    'scope'         => 'openid email profile',
+                    'prompt'        => 'select_account',
+                ]);
+            ?>
+            <a class="btn-google" href="<?= e($google_auth_url) ?>">
+                <svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.6l6.7-6.7C35.6 2.6 30.2 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.8 6.1C12.3 13.3 17.6 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.5 3-2.2 5.5-4.7 7.2l7.3 5.7c4.3-3.9 6.8-9.7 6.8-16.4z"/><path fill="#FBBC05" d="M10.4 28.7c-.5-1.4-.8-2.9-.8-4.7s.3-3.3.8-4.7l-7.8-6.1C.9 16.6 0 20.2 0 24s.9 7.4 2.6 10.8l7.8-6.1z"/><path fill="#34A853" d="M24 48c6.2 0 11.5-2 15.3-5.6l-7.3-5.7c-2 1.4-4.7 2.3-8 2.3-6.4 0-11.7-3.8-13.6-9.1l-7.8 6.1C6.5 42.6 14.6 48 24 48z"/></svg>
+                Continuer avec Google
+            </a>
+        <?php endif; ?>
+
         <p class="muted">
             <a href="?page=inscription">Créer un compte</a> ·
             <a href="?page=forgot_password">Mot de passe oublié ?</a>
@@ -453,13 +551,20 @@ $title = $titles[$page] ?? 'Wallet';
 
 <?php elseif ($page === 'compte' && isset($_SESSION['user_id'])): ?>
     <div class="card">
-        <h2>Mon compte</h2>
-        <p class="muted">Connecté en tant que <b><?= e($_SESSION['pending_identifiant'] ?? '') ?></b></p>
+        <div class="hero-brand" style="margin-bottom:14px">
+            <?php
+                $emailCompte = (string) ($_SESSION['pending_identifiant'] ?? '');
+                $initiale = strtoupper(substr($emailCompte, 0, 1) ?: 'U');
+            ?>
+            <div class="hero-logo"><?= e($initiale) ?></div>
+            <div class="hero-title">Bonjour</div>
+            <div class="hero-sub"><?= e($emailCompte) ?></div>
+        </div>
         <div class="grid">
-            <a class="tile" href="?page=portefeuille">💼 Mon portefeuille</a>
-            <a class="tile" href="?page=retrait_mvola">📲 Retrait Mvola</a>
-            <a class="tile" href="?page=support">🆘 Support</a>
-            <a class="tile" href="?page=contact">📬 Contact</a>
+            <a class="tile" href="?page=portefeuille">💼<br>Mon portefeuille</a>
+            <a class="tile" href="?page=retrait_mvola">📲<br>Retrait Mvola</a>
+            <a class="tile" href="?page=support">🆘<br>Support</a>
+            <a class="tile" href="?page=contact">📬<br>Contact</a>
         </div>
     </div>
 

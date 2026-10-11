@@ -1,5 +1,9 @@
 # Dépendances / secrets locaux
 .env
+*.env.sh
+
+# APK compilé (artefact de build)
+*.apk
 
 # Logs applicatifs
 wallet-mails.log
