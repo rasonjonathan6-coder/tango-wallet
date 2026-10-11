@@ -1,0 +1,51 @@
+# ============================================================================
+# Blueprint Render (offre gratuite) pour Tango Wallet.
+#
+# 1. Poussez ce depot sur GitHub.
+# 2. Render -> New + -> Blueprint -> selectionnez ce depot.
+# 3. Renseignez les variables marquees "sync: false" (base MySQL externe,
+#    Google, Plisio) dans le tableau de bord Render.
+#
+# Limites de l'offre gratuite Render : le service se met en veille apres
+# 15 min sans trafic (il redemarre a la 1re visite) et Render ne fournit pas
+# de base MySQL : utilisez une base MySQL gratuite externe (db4free.net).
+# ============================================================================
+services:
+  - type: web
+    name: tango-wallet
+    runtime: docker
+    plan: free
+    region: frankfurt
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: DB_PORT
+        value: "3306"
+      # --- Base MySQL externe (a renseigner dans Render) ---
+      - key: DB_HOST
+        sync: false
+      - key: DB_NAME
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASS
+        sync: false
+      # --- Secrets applicatifs (a renseigner dans Render) ---
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: CRYPTO_KEY
+        generateValue: true
+      - key: CALLBACK_BASE_URL
+        sync: false
+      # --- Google OAuth ---
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_REDIRECT_URI
+        sync: false
+      # --- Plisio ---
+      - key: PLISIO_SECRET_KEY
+        sync: false

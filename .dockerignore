@@ -1,0 +1,17 @@
+.git
+.gitignore
+.agents
+.github
+android-app
+downloads
+tests
+docs
+home_visual_review
+*.zip
+*.apk
+.env
+*.env.sh
+*.md
+docker-compose.yml
+deploy.sh
+run_servers.sh
