@@ -95,3 +95,47 @@ Toute la configuration passe par des variables d'environnement (voir
 - `wallet/check_wallet_deposits.php` : détection des dépôts blockchain.
 - `wallet/cron_http.php?token=...` : déclenchement des crons via HTTP.
 - `wallet/cron_update_taux.php` : mise à jour du taux USDT → MGA.
+
+## Configuration Plisio (IP autorisée + Status URL)
+
+Pour que les dépôts et les retraits fonctionnent, la boutique Plisio doit
+autoriser l'IP du serveur et connaître l'URL du webhook.
+
+1. **IP autorisée** — dans Plisio → Shop settings → *Allowed IP addresses*,
+   ajoutez l'IP **sortante** du serveur. Pour la connaître :
+
+   ```bash
+   curl https://api.ipify.org
+   ```
+
+   ou ouvrez (avec le token de diagnostic) :
+
+   ```
+   https://VOTRE-DOMAINE/wallet/diag_plisio_config.php?token=VOTRE_TOKEN
+   ```
+
+2. **Status URL (webhook)** — renseignez l'URL qui reçoit les callbacks :
+
+   ```
+   https://VOTRE-DOMAINE/wallet/webhook_plisio.php
+   ```
+
+   Cette URL crédite le portefeuille à la confirmation d'un dépôt
+   (`ipn_type = pay_in`). Pour les factures créées par `create_invoice.php`,
+   le callback est `wallet/plisio_status.php`.
+
+3. **White-label payment processing** — activez cette option dans Plisio pour
+   obtenir des adresses de dépôt permanentes (`shops/deposit/new`).
+
+4. **Variables d'environnement** — si l'instance en ligne n'est pas
+   `deblocagetango.com`, surchargez les URLs :
+
+   ```
+   CALLBACK_BASE_URL=https://VOTRE-DOMAINE
+   PLISIO_STATUS_URL=https://VOTRE-DOMAINE/wallet/webhook_plisio.php
+   PLISIO_SUCCESS_URL=https://VOTRE-DOMAINE/success.php
+   PLISIO_FAIL_URL=https://VOTRE-DOMAINE/failed.php
+   ```
+
+> Le webhook vérifie la signature HMAC (`verify_hash`) avec `PLISIO_SECRET_KEY`.
+> Sans cette clé correctement configurée, tous les callbacks sont rejetés (422).

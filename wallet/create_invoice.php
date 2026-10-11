@@ -75,11 +75,17 @@ $params = [
 
     "email" => $email,
 
-    "callback_url" => "https://deblocagetango.com/wallet/plisio_status.php",
+    // URLs de retour Plisio. Par défaut on se base sur le domaine de production
+    // (CALLBACK_BASE_URL), surchargeable par variables d'environnement pour
+    // pointer vers l'instance réellement en ligne (ex: IP ou nouveau domaine).
+    "callback_url" => getenv('PLISIO_STATUS_URL')
+        ?: rtrim(getenv('CALLBACK_BASE_URL') ?: 'https://deblocagetango.com', '/') . "/wallet/plisio_status.php",
 
-    "success_callback_url" => "https://deblocagetango.com/success.php",
+    "success_callback_url" => getenv('PLISIO_SUCCESS_URL')
+        ?: rtrim(getenv('CALLBACK_BASE_URL') ?: 'https://deblocagetango.com', '/') . "/success.php",
 
-    "fail_callback_url" => "https://deblocagetango.com/failed.php"
+    "fail_callback_url" => getenv('PLISIO_FAIL_URL')
+        ?: rtrim(getenv('CALLBACK_BASE_URL') ?: 'https://deblocagetango.com', '/') . "/failed.php"
 
 ];
 
