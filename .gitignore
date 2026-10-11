@@ -13,3 +13,8 @@ webhook_plisio_diag.log
 # Divers
 .DS_Store
 Thumbs.db
+
+# Android
+local.properties
+.gradle/
+build/

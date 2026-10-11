@@ -8,6 +8,20 @@ de l'archive `wallet.zip` : le module `wallet/` fourni a été conservé tel que
 et les fichiers de support manquants (configuration, e-mails, chiffrement,
 schéma de base de données, contrôleur frontal) ont été réécrits.
 
+## Téléchargements
+
+- **APK Android** : [tango-wallet-v1.0.0.apk](https://github.com/rasonjonathan6-coder/tango-wallet/releases/download/v1.0.0/tango-wallet-v1.0.0.apk)
+- **Application Android (source)** : dossier [`android-app/`](android-app/)
+
+## Mise en production
+
+Voir [PRODUCTION.md](PRODUCTION.md) pour la checklist complète, ou déployer sur
+un VPS Debian/Ubuntu neuf avec un seul script :
+
+```bash
+bash deploy.sh wallet.mondomaine.com
+```
+
 ## Fonctionnalités
 
 - **Comptes utilisateurs** : inscription avec vérification par code e-mail,

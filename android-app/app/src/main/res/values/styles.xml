@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Wallet" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="colorPrimary">#0F2C4C</item>
+        <item name="colorPrimaryDark">#0A2038</item>
+        <item name="colorAccent">#F0B429</item>
+    </style>
+</resources>

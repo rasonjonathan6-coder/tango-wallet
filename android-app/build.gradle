@@ -1,0 +1,5 @@
+// Configuration Gradle racine. Les plugins sont déclarés ici et appliqués
+// dans le module :app.
+plugins {
+    id 'com.android.application' version '8.5.2' apply false
+}

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Tango Wallet</string>
+    <string name="settings_title">Hébergement</string>
+    <string name="menu_refresh">Actualiser</string>
+    <string name="menu_settings">Changer d\'hébergement</string>
+    <string name="settings_saved">Hébergement enregistré</string>
+    <string name="settings_hint">URL de base (ex: https://mon-domaine.com)</string>
+    <string name="settings_save">Enregistrer</string>
+</resources>
