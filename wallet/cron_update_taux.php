@@ -13,6 +13,15 @@
 require_once "../config.php";
 require_once "taux.php";
 
+// Appel web (cron-job.org) : exige le jeton. En CLI (crontab), pas de jeton.
+if (PHP_SAPI !== 'cli') {
+    $secretAttendu = getenv('CRON_SECRET_TOKEN') ?: '';
+    if ($secretAttendu === '' || !isset($_GET['token']) || !hash_equals($secretAttendu, $_GET['token'])) {
+        http_response_code(403);
+        exit('forbidden');
+    }
+}
+
 $tauxBinance = fetchTauxBinanceP2P();
 
 if($tauxBinance === null){
