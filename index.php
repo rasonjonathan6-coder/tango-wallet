@@ -9,9 +9,18 @@
 
 ob_start();
 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+// Les erreurs ne s'affichent qu'en dehors de la production (APP_ENV=production).
+$app_env = getenv('APP_ENV') ?: 'dev';
+if ($app_env === 'production') {
+    ini_set('display_errors', 0);
+    ini_set('display_startup_errors', 0);
+    error_reporting(E_ALL & ~E_DEPRECATED & ~E_NOTICE);
+    ini_set('log_errors', 1);
+} else {
+    ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 1);
+    error_reporting(E_ALL);
+}
 
 if (session_status() === PHP_SESSION_NONE) {
     $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')

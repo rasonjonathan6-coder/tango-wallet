@@ -1,0 +1,37 @@
+# ============================================================
+# Tango Wallet — durcissement Apache (production)
+# Ces règles s'appliquent au dossier et à ses sous-dossiers (wallet/).
+# ============================================================
+
+# --- 1. Interdire l'accès web aux fichiers sensibles ---------
+<FilesMatch "(^\.env|\.env\.example|\.gitignore|\.sql$|\.log$|^config\.php$|^plisio_config\.php$|^mail\.php$|^crypto\.php$|^release_wallets\.php$|^taux\.php$|^wallet_functions\.php$|^plisio_api\.php$|^blockchain_config\.php$)">
+    Require all denied
+</FilesMatch>
+
+# Scripts de maintenance / diagnostic : jamais accessibles par le web.
+# (Le webhook Plisio et les pages client restent volontairement ouverts.)
+<FilesMatch "^(diag_|fix_|audit_|cron_|check_wallet_deposits)">
+    Require all denied
+</FilesMatch>
+
+# --- 2. En-têtes de sécurité --------------------------------
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "DENY"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+</IfModule>
+
+# --- 3. Désactiver le listing des dossiers ------------------
+Options -Indexes
+
+# --- 4. Masquer la signature PHP ----------------------------
+<IfModule mod_php.c>
+    php_flag expose_php off
+</IfModule>
+
+# --- 5. Ne jamais servir les fichiers de sauvegarde / éditeur
+<FilesMatch "\.(bak|old|orig|swp|save)$">
+    Require all denied
+</FilesMatch>

@@ -1,7 +1,14 @@
 <?php
 
-ini_set('display_errors',1);
-error_reporting(E_ALL);
+// En production, ne jamais afficher les erreurs (script exécuté en cron).
+if ((getenv('APP_ENV') ?: 'dev') === 'production') {
+    ini_set('display_errors', 0);
+    ini_set('log_errors', 1);
+    error_reporting(E_ALL & ~E_DEPRECATED & ~E_NOTICE);
+} else {
+    ini_set('display_errors', 1);
+    error_reporting(E_ALL);
+}
 
 require_once "../config.php";
 require_once "blockchain_config.php";
