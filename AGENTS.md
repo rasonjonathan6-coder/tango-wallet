@@ -257,6 +257,17 @@ Une couche de compatibilite permet de tourner sur PostgreSQL sans modifier les
 - Palette : teal/cyan pour les actions, indigo en accent, vert pour les valeurs
   positives et les depots, rouge pour les erreurs. Plus de rose `#ff2ea6`.
 
+## Endpoints AJAX du portefeuille (pieges connus)
+- `wallet/get_solde.php` : rafraichissement du solde (appele toutes les 5 s par
+  `portefeuille.php` et `retrait_mvola.php`). Etait VIDE dans le depot d'origine
+  et bloque par `.htaccess` -> reconstruit (solde brut - 2,5 %, arrondi bas) et
+  retire de la liste des fichiers bloques. Ne pas le re-bloquer.
+- `wallet/get_taux_historique.php` : courbe du cours (voir piege INTERVAL).
+- `wallet/index.php` (8011 lignes) : ancien monolithe NON route (le routeur est
+  `index.php` racine). Joignable en direct sur `/wallet/index.php` et fait
+  appel a des fichiers inexistants (`check_manual_payment.php`, `mvola/...`) :
+  ne pas le confondre avec l'app active, il n'est jamais inclus.
+
 ## Pieges de portabilite SQL (MySQL -> PostgreSQL)
 - La couche `wallet/db.php` traduit seulement `INSERT IGNORE`,
   `ON DUPLICATE KEY UPDATE` et neutralise les `CREATE TABLE`. Elle ne traduit
