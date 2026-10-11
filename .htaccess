@@ -3,6 +3,15 @@
 # Ces règles s'appliquent au dossier et à ses sous-dossiers (wallet/).
 # ============================================================
 
+# --- 0. Routes propres ---------------------------------------
+# /google_callback -> /?page=google_callback
+# Permet d'enregistrer dans Google une URL de redirection sans paramètre de
+# requête (plus fiable que « /?page=google_callback »).
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^google_callback/?$ /index.php?page=google_callback [L,QSA]
+</IfModule>
+
 # --- 1. Interdire l'accès web aux fichiers sensibles ---------
 <FilesMatch "(^\.env|\.env\.example|\.gitignore|\.sql$|\.log$|^config\.php$|^plisio_config\.php$|^mail\.php$|^crypto\.php$|^release_wallets\.php$|^taux\.php$|^wallet_functions\.php$|^plisio_api\.php$|^blockchain_config\.php$)">
     Require all denied
