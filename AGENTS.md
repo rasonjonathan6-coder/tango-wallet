@@ -233,3 +233,23 @@ Une couche de compatibilite permet de tourner sur PostgreSQL sans modifier les
 - `https://tango-wallet.onrender.com/wallet/cron_update_taux.php?token=<CRON_SECRET_TOKEN>` (toutes les 30 min)
 - `https://tango-wallet.onrender.com/wallet/log_taux_historique.php?secret=<CRON_SECRET>` (toutes les 30-60 min)
 
+## Design system de l'interface (« Aurora », 2026)
+- Feuille de style maitresse : `admin_style.css` (racine), chargee par
+  `index.php`, `verify.php`, `go.php` et les pages `wallet/admin_*.php`.
+- Jetons CSS dans `:root` : `--bg`, `--surface`, `--border`, `--primary`
+  (#7b8cff), `--primary-2` (#a978ff), `--accent` (#22d3a6), `--ok`, `--err`,
+  `--radius`, `--radius-sm`, `--shadow`, `--grad`, `--grad-accent`.
+- Composants : `.topbar`, `.container`, `.card` (+ `.center`), `.form`/`.field`,
+  `.btn` (+ `.secondary`/`.danger`/`.accent`/`.block`), `.btn-google`, `.alert`
+  (+ `.ok`/`.err`), `.grid`/`.tile`, `.sep`, `.footer`, `.lock-card`,
+  `.admin-*`, `.hero-*`, `.eyebrow`.
+- Barre de navigation mobile `.tabbar` : visible <= 640px, affichee dans
+  `index.php` quand `$_SESSION['user_id']` est defini (classe `has-tabbar`).
+- `wallet/portefeuille.php` possede son CSS inline (glassmorphism) + un bloc
+  final « Harmonisation Aurora » qui aligne la palette sur indigo/violet
+  (bordure animee adoucie, carte solde, actions, cours, bottom-nav).
+- Palette : indigo/violet pour les actions, menthe/vert pour les valeurs
+  positives et les depots. Evite le rose flashy `#ff2ea6` pour l'UI chrome.
+- Les libelles de formulaire utilisent `<label for>` + `autocomplete` (pas
+  seulement des placeholders).
+
