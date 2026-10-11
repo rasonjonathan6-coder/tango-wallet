@@ -53,8 +53,10 @@ if (!$wallet) {
 
 // TRC20 supprimé : uniquement des adresses BEP20 (frais Plisio TRC20 trop élevés).
 
-// Créer (si besoin) les 10 adresses BEP20 de l'utilisateur
-$bep20Addresses = ensureUserBep20Addresses($pdo, $user_id, 10);
+// Adresses BEP20 : la 1re est créée à l'inscription ; les suivantes sont
+// ajoutées progressivement (1 par ouverture du portefeuille) jusqu'à 10,
+// pour ne pas bloquer la page sur plusieurs appels Plisio.
+$bep20Addresses = completerAdressesDepotProgressive($pdo, $user_id, 10, 1);
 
 // Recharge finale des données du portefeuille
 $stmt = $pdo->prepare("

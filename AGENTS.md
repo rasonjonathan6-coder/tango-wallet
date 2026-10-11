@@ -185,15 +185,19 @@ Une couche de compatibilite permet de tourner sur PostgreSQL sans modifier les
 - Base : `user_wallets.wallet_trc20` remis a NULL ; aucun depot TRC20 en base.
 - Page admin `wallet/admin_wallets.php` (`?page=admin_wallets`) : genere les 10
   adresses BEP20 d'un client / de tous les clients via Plisio.
-- **Distribution automatique** : des l'inscription (verification e-mail
-  `verify.php`) et a la 1re connexion Google (`index.php` callback), la fonction
-  `provisionnerAdressesDepot()` (`wallet/wallet_functions.php`) cree la ligne
-  `user_wallets`, genere les 10 adresses BEP20 via Plisio et renseigne
-  `wallet_bep20` (= slot 1). Idempotent, n'echoue jamais une inscription.
-  - Teste reellement : nouveau compte -> 10 adresses BEP20 distinctes,
-    `wallet_bep20` renseigne. Utilisateur existant id=1 provisionne (10 adresses).
-  - Complement : ajouter des adresses BEP20 manuellement reste possible via
-    `?page=admin_wallets` si besoin.
+- **Distribution automatique (progressive)** : a la creation de compte
+  (verification e-mail `verify.php`, 1re connexion Google `index.php`), la
+  fonction `provisionnerAdressesDepot()` cree la ligne `user_wallets` et genere
+  **1 seule** adresse BEP20 Plisio (reponse rapide). Les 9 suivantes sont
+  ajoutees **progressivement, 1 par ouverture du portefeuille**
+  (`portefeuille.php` -> `completerAdressesDepotProgressive()`), jusqu'a 10.
+  - `ensureUserBep20Addresses($pdo,$uid,$nombre,$maxNouvelles)` : le 4e
+    parametre plafonne les creations d'un appel (evite 10 appels Plisio d'un
+    coup sur une requete web).
+  - Teste reellement : inscription -> 1 adresse + `wallet_bep20` renseigne ;
+    9 visites -> 10 adresses distinctes.
+  - Idempotent, ne fait jamais echouer une inscription (echecs Plisio journalises).
+  - Generation forcee des 10 d'un coup : page admin `?page=admin_wallets`.
 - ⚠️ Le webhook Plisio accepte toujours les anciens `deposit_uid` numeriques
   (utile si une ancienne adresse TRC20 est encore utilisee) : rien a changer,
   le solde est credite par `deposit_uid` -> user_id.

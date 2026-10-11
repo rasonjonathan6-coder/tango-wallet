@@ -179,16 +179,26 @@ function getUserBep20Addresses($pdo, $user_id){
  * distinctes (10 par défaut). Génère celles qui manquent via Plisio,
  * en utilisant un "uid" différent par slot (user_id-bep20-N) pour que
  * Plisio renvoie une adresse différente à chaque fois.
+ *
+ * $maxNouvelles : plafonne le nombre d'adresses créées lors de CET appel
+ * (null = aucune limite). Sert à la génération progressive : on évite de
+ * bloquer une requête web avec 10 appels Plisio d'un coup.
  */
-function ensureUserBep20Addresses($pdo, $user_id, $nombre = 10){
+function ensureUserBep20Addresses($pdo, $user_id, $nombre = 10, $maxNouvelles = null){
 
     $existantes = getUserBep20Addresses($pdo, $user_id);
     $slotsExistants = array_column($existantes, 'slot');
+
+    $creees = 0;
 
     for($slot = 1; $slot <= $nombre; $slot++){
 
         if(in_array($slot, $slotsExistants)){
             continue;
+        }
+
+        if($maxNouvelles !== null && $creees >= $maxNouvelles){
+            break;
         }
 
         $uidPlisio = $user_id . "-bep20-" . $slot;
@@ -204,6 +214,8 @@ function ensureUserBep20Addresses($pdo, $user_id, $nombre = 10){
             ");
             $stmt->execute([$user_id, $slot, $result['data']['hash']]);
 
+            $creees++;
+
         } elseif(isset($result['data']['message'])){
             error_log("Plisio createPlisioWallet BEP20 slot ".$slot." échec user_id=".$user_id." : ".$result['data']['message']);
         }
@@ -216,17 +228,18 @@ function ensureUserBep20Addresses($pdo, $user_id, $nombre = 10){
 
 
 /**
- * Provisionne automatiquement les adresses de depot d'un nouvel utilisateur.
+ * Provisionne les adresses de depot d'un utilisateur.
  *
- * Garantit la ligne user_wallets, genere les 10 adresses BEP20 via Plisio
- * (uid "user_id-bep20-N") et renseigne wallet_bep20 (adresse d'affichage =
- * premier slot) si elle est vide.
+ * $nombre     : nombre total d'adresses visees (10).
+ * $immediates : nombre d'adresses a creer lors de CET appel. A l'inscription
+ *               on n'en cree qu'UNE seule (reponse rapide, 1 seul appel
+ *               Plisio) ; le reste est complete progressivement, a chaque
+ *               ouverture du portefeuille (voir $completerParVisite).
  *
- * Idempotent : ne regenere jamais un slot deja present. Ne lance jamais
- * d'exception (les echecs Plisio sont journalises) pour ne pas casser une
- * inscription si l'API distante est indisponible.
+ * Renseigne aussi wallet_bep20 (adresse d'affichage) avec la 1re adresse si
+ * elle est vide. Idempotent, ne lance jamais d'exception.
  */
-function provisionnerAdressesDepot($pdo, $user_id, $nombre = 10){
+function provisionnerAdressesDepot($pdo, $user_id, $nombre = 10, $immediates = 1){
 
     $user_id = (int) $user_id;
     if($user_id <= 0){
@@ -242,7 +255,7 @@ function provisionnerAdressesDepot($pdo, $user_id, $nombre = 10){
                 ->execute([$user_id]);
         }
 
-        $adresses = ensureUserBep20Addresses($pdo, $user_id, $nombre);
+        $adresses = ensureUserBep20Addresses($pdo, $user_id, $nombre, $immediates);
 
         if(!empty($adresses)){
             $stmt = $pdo->prepare("SELECT wallet_bep20 FROM user_wallets WHERE user_id=? LIMIT 1");
@@ -258,6 +271,50 @@ function provisionnerAdressesDepot($pdo, $user_id, $nombre = 10){
     } catch (\Throwable $e) {
         error_log("provisionnerAdressesDepot user_id=".$user_id." : ".$e->getMessage());
         return false;
+    }
+
+}
+
+
+/**
+ * Complète progressivement les adresses BEP20 manquantes d'un utilisateur
+ * (1 adresse de plus par appel). Appelée à l'ouverture du portefeuille :
+ * un nouvel inscrit a donc 1 adresse tout de suite, puis 10 en quelques
+ * visites — sans jamais bloquer une requête sur 10 appels Plisio.
+ */
+function completerAdressesDepotProgressive($pdo, $user_id, $nombre = 10, $parVisite = 1){
+
+    $user_id = (int) $user_id;
+    if($user_id <= 0){
+        return [];
+    }
+
+    try {
+
+        $existantes = getUserBep20Addresses($pdo, $user_id);
+
+        if(count($existantes) >= $nombre){
+            return $existantes;
+        }
+
+        // La 1re adresse a-t-elle bien ete creee ? Si l'inscription n'a pas
+        // pu joindre Plisio, on rattrape d'abord ce minimum.
+        $adresses = ensureUserBep20Addresses($pdo, $user_id, $nombre, max($parVisite, 1));
+
+        if(!empty($adresses)){
+            $stmt = $pdo->prepare("SELECT wallet_bep20 FROM user_wallets WHERE user_id=? LIMIT 1");
+            $stmt->execute([$user_id]);
+            if(!trim((string) $stmt->fetchColumn())){
+                $pdo->prepare("UPDATE user_wallets SET wallet_bep20=? WHERE user_id=?")
+                    ->execute([$adresses[0]['adresse'], $user_id]);
+            }
+        }
+
+        return $adresses;
+
+    } catch (\Throwable $e) {
+        error_log("completerAdressesDepotProgressive user_id=".$user_id." : ".$e->getMessage());
+        return getUserBep20Addresses($pdo, $user_id);
     }
 
 }
