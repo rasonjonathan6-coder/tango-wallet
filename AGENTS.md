@@ -202,6 +202,24 @@ Une couche de compatibilite permet de tourner sur PostgreSQL sans modifier les
   (utile si une ancienne adresse TRC20 est encore utilisee) : rien a changer,
   le solde est credite par `deposit_uid` -> user_id.
 
+## Durcissement / nettoyage prod (2026-10-11)
+
+- **Faute corrigee** : `wallet/test_plisio.php` etait accessible publiquement
+  (`/wallet/test_plisio.php`) et affichait TOUT l'historique Plisio (montants,
+  adresses, retraits). `.htaccess` le bloque desormais, ainsi que
+  `check_deposits.php` / `check_bep20.php` / `check_trc20.php`, `get_solde.php`,
+  `admin_retraits_1mvola.php`, `retrait_mvola1.php` et tous les fichiers
+  « nom (1).php ».
+- Fichiers supprimes (doublons / obsolètes, aucun n'etait route) :
+  `wallet/check_wallet_deposits(1).php`, `historique(1).php`,
+  `view_webhook_log(1).php`, `webhook_plisio_diag(1).php`,
+  `diag_deposit .php` (espace), `retrait_mvola 20.php` (espace),
+  `check_trc20.php` (vide), `check_bep20.php` (vide), `check_deposits.php`,
+  `retrait_mvola1.php`, `admin_retraits_1mvola.php`.
+- `cron_http.php` pointe directement sur `check_wallet_deposits.php`.
+- Le blocage `.htaccess` n'affecte PAS les `require` serveur : le cron
+  fonctionne toujours (verifie en live : « Termine »).
+
 ### Cles blockchain (configurees 2026-10-11)
 - `MEGANODE_API_KEY` (NodeReal), `ANKR_API_KEY`, `BSC_API_KEY` recuperees depuis
   le `wallet.zip` d'origine et configurees sur Render. Testees : NodeReal

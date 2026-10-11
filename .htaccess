@@ -21,7 +21,15 @@
 # (Le webhook Plisio et les pages client restent volontairement ouverts.)
 # Exception : cron_http.php et log_taux_historique.php sont joignables par le
 # web cron (cron-job.org), proteges par leur propre jeton CRON_SECRET.
-<FilesMatch "^(diag_|fix_|audit_|check_wallet_deposits|plisio_status|webhook_plisio_diag)">
+# check_deposits.php : simple point d'entree du cron (inclus par cron_http.php,
+# aucun secret dedans) -> jamais joignable directement.
+# test_plisio.php : expose tout l'historique Plisio -> danger, bloque.
+<FilesMatch "^(diag_|fix_|audit_|check_wallet_deposits|check_deposits$|check_bep20$|check_trc20$|plisio_status|webhook_plisio_diag|test_plisio$|get_solde$|admin_retraits_1mvola$|retrait_mvola1$)">
+    Require all denied
+</FilesMatch>
+
+# Fichiers de sauvegarde cote a cote avec l'original : « nom (1).php ».
+<FilesMatch "\(1\)\.php$">
     Require all denied
 </FilesMatch>
 

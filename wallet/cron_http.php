@@ -49,7 +49,7 @@ touch($lockFile);
 
 header("Content-Type: text/plain; charset=utf-8");
 
-require_once __DIR__ . "/check_deposits.php";
+require_once __DIR__ . "/check_wallet_deposits.php";
 
 flock($lock, LOCK_UN);
 fclose($lock);
