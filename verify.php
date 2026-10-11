@@ -61,8 +61,11 @@ if (isset($_POST['verifier'])) {
         <p class="muted">Saisissez le code à 6 chiffres reçu par e-mail.</p>
         <?php if ($erreur): ?><div class="alert err"><?= htmlspecialchars($erreur) ?></div><?php endif; ?>
         <form method="POST" class="form">
-            <input type="text" name="code" inputmode="numeric" maxlength="6" placeholder="123456" required autofocus>
-            <button type="submit" name="verifier" class="btn">Vérifier</button>
+            <div class="field">
+                <label for="code">Code de vérification</label>
+                <input id="code" type="text" name="code" inputmode="numeric" maxlength="6" placeholder="123456" required autofocus>
+            </div>
+            <button type="submit" name="verifier" class="btn block">Vérifier</button>
         </form>
     </div>
 </main>

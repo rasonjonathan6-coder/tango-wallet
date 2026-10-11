@@ -434,7 +434,7 @@ $title = $titles[$page] ?? 'Wallet';
     <title><?= e($title) ?> — Wallet</title>
     <link rel="stylesheet" href="admin_style.css">
 </head>
-<body class="app-body">
+<body class="app-body<?= isset($_SESSION['user_id']) ? ' has-tabbar' : '' ?>">
 
 <header class="topbar">
     <span class="brand">💼 Wallet</span>
@@ -479,10 +479,16 @@ $title = $titles[$page] ?? 'Wallet';
         </div>
         <h2>Connexion</h2>
         <form method="POST" class="form">
-            <input type="text" name="identifiant" placeholder="Email" required autocomplete="off">
-            <input type="password" name="mdp" placeholder="Mot de passe" required autocomplete="current-password">
+            <div class="field">
+                <label for="identifiant">Adresse e-mail</label>
+                <input id="identifiant" type="text" name="identifiant" placeholder="vous@exemple.com" required autocomplete="username">
+            </div>
+            <div class="field">
+                <label for="mdp">Mot de passe</label>
+                <input id="mdp" type="password" name="mdp" placeholder="••••••••" required autocomplete="current-password">
+            </div>
             <label class="check"><input type="checkbox" name="remember_me"> Se souvenir de moi</label>
-            <button type="submit" name="ajouter" class="btn">Se connecter</button>
+            <button type="submit" name="ajouter" class="btn block">Se connecter</button>
         </form>
 
         <?php if ($google_client_id !== ''): ?>
@@ -510,11 +516,18 @@ $title = $titles[$page] ?? 'Wallet';
 
 <?php elseif ($page === 'inscription'): ?>
     <div class="card center">
-        <h2>Inscription</h2>
+        <h2>Créer un compte</h2>
+        <p class="muted" style="margin:-10px 0 16px">Recevez votre adresse de dépôt crypto immédiatement.</p>
         <form method="POST" class="form">
-            <input type="email" name="email_inscription" placeholder="Adresse Gmail" required>
-            <input type="password" name="mdp_inscription" placeholder="Mot de passe" required>
-            <button type="submit" name="inscrire" class="btn">S'inscrire</button>
+            <div class="field">
+                <label for="email_inscription">Adresse e-mail</label>
+                <input id="email_inscription" type="email" name="email_inscription" placeholder="vous@exemple.com" required autocomplete="email">
+            </div>
+            <div class="field">
+                <label for="mdp_inscription">Mot de passe</label>
+                <input id="mdp_inscription" type="password" name="mdp_inscription" placeholder="••••••••" required autocomplete="new-password">
+            </div>
+            <button type="submit" name="inscrire" class="btn block">S'inscrire</button>
         </form>
         <p class="muted">Déjà inscrit ? <a href="?page=dashboard">Se connecter</a></p>
     </div>
@@ -522,9 +535,13 @@ $title = $titles[$page] ?? 'Wallet';
 <?php elseif ($page === 'forgot_password'): ?>
     <div class="card center">
         <h2>Mot de passe oublié</h2>
+        <p class="muted" style="margin:-10px 0 16px">Nous vous enverrons un code de vérification.</p>
         <form method="POST" class="form">
-            <input type="email" name="email_reset" placeholder="Votre email" required>
-            <button type="submit" name="send_otp" class="btn">Envoyer le code</button>
+            <div class="field">
+                <label for="email_reset">Adresse e-mail</label>
+                <input id="email_reset" type="email" name="email_reset" placeholder="vous@exemple.com" required autocomplete="email">
+            </div>
+            <button type="submit" name="send_otp" class="btn block">Envoyer le code</button>
         </form>
     </div>
 
@@ -532,9 +549,15 @@ $title = $titles[$page] ?? 'Wallet';
     <div class="card center">
         <h2>Réinitialisation</h2>
         <form method="POST" class="form">
-            <input type="text" name="otp" placeholder="Code à 6 chiffres" required>
-            <input type="password" name="new_pass" placeholder="Nouveau mot de passe" required>
-            <button type="submit" name="reset_password" class="btn">Réinitialiser</button>
+            <div class="field">
+                <label for="otp">Code de vérification</label>
+                <input id="otp" type="text" name="otp" placeholder="Code à 6 chiffres" inputmode="numeric" required>
+            </div>
+            <div class="field">
+                <label for="new_pass">Nouveau mot de passe</label>
+                <input id="new_pass" type="password" name="new_pass" placeholder="••••••••" required autocomplete="new-password">
+            </div>
+            <button type="submit" name="reset_password" class="btn block">Réinitialiser</button>
         </form>
     </div>
 
@@ -562,18 +585,28 @@ $title = $titles[$page] ?? 'Wallet';
         <h2>Support</h2>
         <p class="muted">Ouvrez une discussion pour un problème de compte.</p>
         <form method="POST" class="form">
-            <input type="text" name="site" placeholder="Site / application concernée" required>
-            <button type="submit" name="ouvrir_discussion" class="btn">Ouvrir une discussion</button>
+            <div class="field">
+                <label for="site">Site / application concernée</label>
+                <input id="site" type="text" name="site" placeholder="Ex. Tango Wallet" required>
+            </div>
+            <button type="submit" name="ouvrir_discussion" class="btn block">Ouvrir une discussion</button>
         </form>
     </div>
 
 <?php elseif ($page === 'contact'): ?>
     <div class="card">
         <h2>Contactez-nous</h2>
+        <p class="muted" style="margin:-10px 0 16px">Notre équipe vous répond dans les plus brefs délais.</p>
         <form method="POST" class="form">
-            <input type="email" name="email_saisi" placeholder="Votre email d'inscription" required>
-            <textarea name="message_content" rows="5" placeholder="Votre message..." required></textarea>
-            <button type="submit" name="envoyer_message" class="btn">Envoyer</button>
+            <div class="field">
+                <label for="email_saisi">Votre e-mail d'inscription</label>
+                <input id="email_saisi" type="email" name="email_saisi" placeholder="vous@exemple.com" required autocomplete="email">
+            </div>
+            <div class="field">
+                <label for="message_content_contact">Votre message</label>
+                <textarea id="message_content_contact" name="message_content" rows="5" placeholder="Décrivez votre demande…" required></textarea>
+            </div>
+            <button type="submit" name="envoyer_message" class="btn block">Envoyer</button>
         </form>
     </div>
 
@@ -582,8 +615,11 @@ $title = $titles[$page] ?? 'Wallet';
         <h2>Réclamation</h2>
         <p class="muted">Décrivez votre problème, notre équipe vous répondra.</p>
         <form method="POST" class="form">
-            <textarea name="message_content" rows="5" placeholder="Votre réclamation..." required></textarea>
-            <button type="submit" name="envoyer_message" class="btn">Envoyer</button>
+            <div class="field">
+                <label for="message_content_reclamation">Votre réclamation</label>
+                <textarea id="message_content_reclamation" name="message_content" rows="5" placeholder="Décrivez votre réclamation…" required></textarea>
+            </div>
+            <button type="submit" name="envoyer_message" class="btn block">Envoyer</button>
         </form>
     </div>
 
@@ -686,6 +722,15 @@ $title = $titles[$page] ?? 'Wallet';
 <?php endif; ?>
 
 </main>
+
+<?php if (isset($_SESSION['user_id'])): ?>
+<nav class="tabbar" aria-label="Navigation principale">
+    <a href="?page=compte" class="<?= $page === 'compte' ? 'active' : '' ?>"><span class="ic">🏠</span>Compte</a>
+    <a href="?page=portefeuille" class="<?= $page === 'portefeuille' ? 'active' : '' ?>"><span class="ic">💼</span>Portefeuille</a>
+    <a href="?page=retrait_mvola" class="<?= $page === 'retrait_mvola' ? 'active' : '' ?>"><span class="ic">📲</span>Retrait</a>
+    <a href="?page=support" class="<?= $page === 'support' ? 'active' : '' ?>"><span class="ic">🆘</span>Support</a>
+</nav>
+<?php endif; ?>
 
 <footer class="footer muted">Wallet — application de gestion de portefeuille crypto</footer>
 </body>

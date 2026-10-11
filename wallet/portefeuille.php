@@ -1339,6 +1339,102 @@ $coursCarte = $tauxAffiche > 0
         color: #1c1c28;
         box-shadow: 0 3px 8px rgba(0,0,0,.25);
     }
+
+    /* ============================================================
+       Harmonisation « Aurora » (2026) — aligne le portefeuille sur le
+       design system de l'application (indigo/violet, vert menthe).
+       ============================================================ */
+    :root{
+        --w-ink:#060814;
+        --w-surface:rgba(20,27,48,.72);
+        --w-border:rgba(140,160,215,.18);
+        --w-primary:#7b8cff;
+        --w-violet:#a978ff;
+        --w-accent:#22d3a6;
+    }
+
+    /* Bordure animée adoucie (fini l'arc-en-ciel rose/cyan clignotant) */
+    .card::before{
+        padding:1px;
+        filter:none;
+        opacity:.55;
+        background:linear-gradient(90deg,transparent 0%,transparent 40%,rgba(123,140,255,.9) 50%,rgba(169,120,255,.9) 55%,transparent 65%);
+        background-size:300% 300%;
+        animation:borderTravel 14s linear infinite;
+    }
+    .card::after{ opacity:.35; filter:blur(26px); }
+
+    /* Marque : dégradé indigo/violet au lieu du rose */
+    .wallet-title span{ background:linear-gradient(to right,#9fb0ff,#c9a6ff); }
+    .wallet-logo{ box-shadow:0 0 20px rgba(123,140,255,.5); }
+    .splash-logo{ box-shadow:0 0 35px rgba(123,140,255,.55), 0 0 70px rgba(34,211,166,.3); }
+    .splash-text{ background:linear-gradient(90deg,#9fb0ff,#c9a6ff,#22d3a6); background-size:200% auto; }
+    .splash-loader::after{ background:linear-gradient(90deg,#7b8cff,#22d3a6); }
+    @keyframes pulseLogo{
+        0%{transform:scale(.92);box-shadow:0 0 22px rgba(123,140,255,.4);}
+        50%{transform:scale(1.08);box-shadow:0 0 46px rgba(123,140,255,.75),0 0 80px rgba(34,211,166,.5);}
+        100%{transform:scale(.92);box-shadow:0 0 22px rgba(123,140,255,.4);}
+    }
+
+    /* Carte solde : velours indigo, léger relief */
+    .balance-card{
+        background:linear-gradient(135deg,rgba(123,140,255,.28),rgba(42,26,86,.5));
+        border-color:rgba(140,160,215,.28);
+        box-shadow:0 18px 44px -18px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.06);
+    }
+    .balance-label b{ color:var(--w-accent); }
+    .balance-network-badge{ background:rgba(34,211,166,.12); border-color:rgba(34,211,166,.35); color:#8ff3cd; }
+    .balance-network-badge svg{ stroke:#8ff3cd; }
+
+    /* Boutons d'action */
+    .action-btn{
+        background:linear-gradient(135deg,rgba(123,140,255,.22),rgba(24,18,48,.65));
+        border-color:rgba(140,160,215,.22);
+        box-shadow:0 14px 32px -18px rgba(0,0,0,.8);
+    }
+    .action-btn:hover{
+        background:linear-gradient(135deg,rgba(123,140,255,.34),rgba(30,22,60,.75));
+        border-color:rgba(160,180,255,.4);
+    }
+    .action-icon.depot{ background:rgba(34,211,166,.16); }
+    .action-icon.depot svg{ stroke:#22d3a6; }
+
+    /* Carte cours USDT */
+    .cours-card{
+        background:linear-gradient(135deg,rgba(123,140,255,.2),rgba(24,18,48,.62));
+        border-color:rgba(140,160,215,.22);
+    }
+    .cours-valeur{ color:#8ff3cd; }
+    .cours-badge.hausse{ background:rgba(34,211,166,.15); color:#8ff3cd; }
+    .cours-periode-btn.active{ background:rgba(123,140,255,.2); border-color:rgba(140,160,255,.45); color:#c9ccff; }
+
+    /* Topbar / avatar */
+    .topbar-avatar{ background:linear-gradient(135deg,#7b8cff,#a978ff); }
+    .topbar-menu,.topbar-bell{ background:rgba(140,160,215,.1); border-color:rgba(140,160,215,.18); }
+
+    /* Réseaux actifs : violet au lieu du rose */
+    .wallet-network-card:hover,
+    .wallet-network-card.wallet-btn-network-active{
+        background:rgba(123,140,255,.14); border-color:#7b8cff; box-shadow:0 8px 25px rgba(123,140,255,.28);
+    }
+    #radioBep20:checked ~ .wallet-network-cards #btnToggleBep20{
+        background:rgba(123,140,255,.14); border-color:#7b8cff; box-shadow:0 8px 25px rgba(123,140,255,.28);
+    }
+    #radioBep20:checked ~ .wallet-network-cards #btnToggleBep20 .wallet-network-arrow{ color:#7b8cff; }
+
+    /* Barre inférieure : verre indigo, actif violet */
+    .bottom-nav{
+        background:linear-gradient(180deg,rgba(16,20,40,.96),rgba(8,11,24,.99));
+        border-color:rgba(140,160,215,.16);
+        -webkit-backdrop-filter:blur(18px); backdrop-filter:blur(18px);
+    }
+    .bottom-nav .nav-item.active{ color:#a978ff; text-shadow:0 0 12px rgba(169,120,255,.7); }
+    .bottom-nav .nav-item.active svg{ stroke:#a978ff; }
+
+    /* Boutons & modales harmonisés */
+    .wallet-btn-secondary{ background:rgba(140,160,215,.12); border-color:rgba(140,160,215,.2); }
+    .wallet-btn-secondary:hover{ background:rgba(140,160,215,.2); }
+    .historique-box{ background:#101528; }
     </style>
 </head>
 <body>
