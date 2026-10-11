@@ -30,8 +30,10 @@ find . -name "*.php" -print0 | xargs -0 -n1 php -l
 ## Points d'architecture
 
 - `index.php` (racine) est le contrôleur frontal : authentification, inscription,
-  espace admin, support, verrou admin en mode web. Il délègue les pages lourdes
-  au module `wallet/`.
+  espace admin, support. Il délègue les pages lourdes au module `wallet/`.
+- Le verrou admin global (écran « Accès restreint ») a été **retiré** le
+  2026-10-11 : la racine `/` affiche la connexion utilisateur. L'espace admin
+  reste protégé par une page de connexion dédiée sur `/?page=admin`.
 - `wallet/` est le module d'origine (portefeuille, retrait Mvola, crons,
   diagnostics). Ses fichiers se chargent entre eux par leur nom grâce au
   `set_include_path()` défini dans `index.php`.
@@ -65,7 +67,8 @@ find . -name "*.php" -print0 | xargs -0 -n1 php -l
 ### Connexion Google
 - Cablee dans `index.php` (`?page=google_callback`) : e-mail Google verifie = proprietaire du portefeuille.
 - Requiert GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET / GOOGLE_REDIRECT_URI (sinon bouton masque).
-- Redirect URI : `https://<domaine>/?page=google_callback`.
+- Redirect URI Render : `https://tango-wallet.onrender.com/google_callback`
+  (route propre via `.htaccess` ; l'ancienne forme `?page=google_callback` marche aussi).
 
 ### Taux USDT/MGA
 - `wallet/taux.php` : Binance P2P (tradeType SELL) moins marge 200 Ar ; cache 30 min.
@@ -111,4 +114,16 @@ Une couche de compatibilite permet de tourner sur PostgreSQL sans modifier les
 - Le depot GitHub `tango-wallet` est passe en **public** pour que Render puisse
   le deployer (Render ne voit pas les depots prives sans autorisation de l'app).
 - Guide : `RENDER.md`.
+
+## Mise a jour 2026-10-11 (b) : acces web public + Google OAuth
+
+- Verrou admin global retire : la racine `/` renvoie vers la connexion
+  utilisateur (`?page=dashboard`). L'espace admin est sur `/?page=admin`
+  (mot de passe `ADMIN_PASSWORD`), protege par la session.
+- Route propre `/google_callback` (regle `.htaccess` mod_rewrite) -> index.php.
+- Google OAuth configure sur Render (`GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`,
+  `GOOGLE_REDIRECT_URI`). URI de redirection a enregistrer dans Google Cloud :
+  `https://tango-wallet.onrender.com/google_callback`.
+- Render n'auto-deploie pas toujours apres un changement de variables : forcer
+  via `POST /v1/services/<id>/deploys` si le commit live ne bouge pas.
 
