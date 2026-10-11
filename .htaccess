@@ -10,6 +10,13 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteRule ^google_callback/?$ /index.php?page=google_callback [L,QSA]
+
+    # Ancien monolithe NON route (le routeur est index.php racine). Joignable
+    # en direct sur /wallet/index.php et faisant appel a des fichiers
+    # inexistants : on coupe l'acces direct pour ne pas exposer une surface
+    # admin obsolete. Ne PAS bloquer "index.php" via <Files> : cela couperait
+    # aussi le index.php racine.
+    RewriteRule ^wallet/index\.php$ - [F]
 </IfModule>
 
 # --- 1. Interdire l'accès web aux fichiers sensibles ---------
