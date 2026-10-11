@@ -74,3 +74,9 @@ find . -name "*.php" -print0 | xargs -0 -n1 php -l
 
 ### Verification depots
 - Webhook `wallet/webhook_plisio.php` : HMAC sha1 (ksort + serialize des POST), idempotent (txid), credite `user_wallets.solde`.
+
+### Depot GitHub
+- Depot : `rasonjonathan6-coder/tango-wallet` (prive, branche `main`).
+- Release `v1.0.0` contient l'APK `tango-wallet-v1.0.0.apk`.
+- Code source Android dans `android-app/` (package `com.tango.wallet`).
+- `deploy.sh` : installation VPS automatique (Apache, PHP 8.2, MariaDB, HTTPS, crons).
