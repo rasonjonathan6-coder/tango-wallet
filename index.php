@@ -62,7 +62,7 @@ $ua_initial = $_SERVER['HTTP_USER_AGENT'] ?? '';
 $est_webview_app = (strpos($ua_initial, 'MonAppAndroid') !== false)
     || (strpos($ua_initial, '; wv)') !== false);
 
-$page = $_GET['page'] ?? ($est_webview_app ? 'dashboard' : 'admin');
+$page = $_GET['page'] ?? 'dashboard';
 $type = $_GET['type'] ?? '';
 
 // ================= OUTILS =================
@@ -397,39 +397,6 @@ if (in_array($page, ['portefeuille', 'retrait_mvola', 'admin_retraits_mvola'], t
     exit;
 }
 
-// ================= VERROU ADMIN (AFFICHAGE) =================
-if (!$est_webview_app && !isset($_SESSION['admin'])) {
-    render_lock($error);
-    exit;
-}
-
-function render_lock(?string $error): void
-{
-    ?>
-    <!DOCTYPE html>
-    <html lang="fr">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Accès restreint</title>
-        <link rel="stylesheet" href="admin_style.css">
-    </head>
-    <body class="lock-body">
-        <div class="lock-card">
-            <h3>🔐 Accès restreint</h3>
-            <form method="POST">
-                <input type="password" name="admin_pwd" placeholder="Mot de passe admin" required autofocus>
-                <button type="submit" name="login_admin">Connexion</button>
-            </form>
-            <?php if ($error): ?>
-                <p class="lock-error"><?= e($error) ?></p>
-            <?php endif; ?>
-        </div>
-    </body>
-    </html>
-    <?php
-}
-
 // ================= AFFICHAGE =================
 $titles = [
     'dashboard'      => 'Accueil',
@@ -622,6 +589,16 @@ $title = $titles[$page] ?? 'Wallet';
         });
     }
     </script>
+
+<?php elseif ($page === 'admin' && !isset($_SESSION['admin'])): ?>
+    <div class="card center">
+        <h2>🔐 Espace admin</h2>
+        <form method="POST" class="form">
+            <input type="password" name="admin_pwd" placeholder="Mot de passe admin" required autofocus>
+            <button type="submit" name="login_admin" class="btn">Connexion</button>
+        </form>
+        <?php if ($error): ?><div class="alert err"><?= e($error) ?></div><?php endif; ?>
+    </div>
 
 <?php elseif ($page === 'admin' && isset($_SESSION['admin'])): ?>
     <div class="card">
