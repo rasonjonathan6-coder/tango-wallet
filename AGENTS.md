@@ -264,9 +264,10 @@ Une couche de compatibilite permet de tourner sur PostgreSQL sans modifier les
   retire de la liste des fichiers bloques. Ne pas le re-bloquer.
 - `wallet/get_taux_historique.php` : courbe du cours (voir piege INTERVAL).
 - `wallet/index.php` (8011 lignes) : ancien monolithe NON route (le routeur est
-  `index.php` racine). Joignable en direct sur `/wallet/index.php` et fait
-  appel a des fichiers inexistants (`check_manual_payment.php`, `mvola/...`) :
-  ne pas le confondre avec l'app active, il n'est jamais inclus.
+  `index.php` racine), jamais inclus, appelant des fichiers inexistants
+  (`check_manual_payment.php`, `mvola/...`). Acces direct desormais BLOQUE par
+  `.htaccess` (`RewriteRule ^wallet/index\.php$ - [F]`). Ne pas le confondre
+  avec l'app active.
 
 ## Pieges de portabilite SQL (MySQL -> PostgreSQL)
 - La couche `wallet/db.php` traduit seulement `INSERT IGNORE`,
