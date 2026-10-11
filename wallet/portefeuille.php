@@ -111,7 +111,7 @@ $coursCarte = $tauxAffiche > 0
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mon Portefeuille - Tango</title>
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#03001e">
+    <meta name="theme-color" content="#f2f5fa">
     <link rel="apple-touch-icon" href="/icon-192.png">
 
     <script>
@@ -607,13 +607,13 @@ $coursCarte = $tauxAffiche > 0
         position: sticky;
         top: 0;
         z-index: 4;
-        background: #161c2b;
+        background: #ffffff;
     }
     html.webview-mode #overlayDepot .wallet-address-sticky-top {
         position: sticky;
         top: 54px;
         z-index: 3;
-        background: #161c2b;
+        background: #ffffff;
         padding-top: 6px;
         padding-bottom: 2px;
     }
@@ -937,7 +937,7 @@ $coursCarte = $tauxAffiche > 0
         max-width: 480px;
         max-height: 82vh;
         max-height: 82dvh;
-        background: #161c2b;
+        background: #ffffff;
         border-radius: 20px 20px 0 0;
         display: flex;
         flex-direction: column;
@@ -1341,100 +1341,172 @@ $coursCarte = $tauxAffiche > 0
     }
 
     /* ============================================================
-       Harmonisation « Aurora » (2026) — aligne le portefeuille sur le
-       design system de l'application (indigo/violet, vert menthe).
+       Theme clair « Fintech » (2026) — convertit le portefeuille en
+       canvas lumineux, cartes blanches, accent teal/cyan.
        ============================================================ */
     :root{
-        --w-ink:#060814;
-        --w-surface:rgba(20,27,48,.72);
-        --w-border:rgba(140,160,215,.18);
-        --w-primary:#7b8cff;
-        --w-violet:#a978ff;
-        --w-accent:#22d3a6;
+        --w-bg:#f2f5fa;
+        --w-card:#ffffff;
+        --w-card-2:#f7f9fd;
+        --w-border:#e2e8f2;
+        --w-border-strong:#cbd5e8;
+        --w-ink:#0e1729;
+        --w-muted:#5b6b88;
+        --w-muted-2:#8b98b3;
+        --w-primary:#0ea5a4;
+        --w-cyan:#22d3ee;
+        --w-indigo:#6366f1;
+        --w-ok:#0f9d6a;
+        --w-err:#e11d48;
+        --w-warn:#d97706;
     }
 
-    /* Bordure animée adoucie (fini l'arc-en-ciel rose/cyan clignotant) */
-    .card::before{
-        padding:1px;
-        filter:none;
-        opacity:.55;
-        background:linear-gradient(90deg,transparent 0%,transparent 40%,rgba(123,140,255,.9) 50%,rgba(169,120,255,.9) 55%,transparent 65%);
-        background-size:300% 300%;
-        animation:borderTravel 14s linear infinite;
+    /* Fond clair (retire l'image sombre d'origine) */
+    body{
+        background-image:none;
+        background-color:var(--w-bg);
+        background:linear-gradient(180deg,#eef3fb 0%,#f2f5fa 60%,#f0f4fb 100%);
+        color:var(--w-ink);
+        font-family:"Inter","SF Pro Display",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
     }
-    .card::after{ opacity:.35; filter:blur(26px); }
-
-    /* Marque : dégradé indigo/violet au lieu du rose */
-    .wallet-title span{ background:linear-gradient(to right,#9fb0ff,#c9a6ff); }
-    .wallet-logo{ box-shadow:0 0 20px rgba(123,140,255,.5); }
-    .splash-logo{ box-shadow:0 0 35px rgba(123,140,255,.55), 0 0 70px rgba(34,211,166,.3); }
-    .splash-text{ background:linear-gradient(90deg,#9fb0ff,#c9a6ff,#22d3a6); background-size:200% auto; }
-    .splash-loader::after{ background:linear-gradient(90deg,#7b8cff,#22d3a6); }
+    #splash-screen{background:#f2f5fa;}
+    .splash-logo{box-shadow:0 18px 40px -16px rgba(14,165,164,.6);}
+    .splash-text{background:linear-gradient(90deg,#0ea5a4,#6366f1,#22d3ee);background-size:200% auto;}
+    .splash-loader{background:rgba(14,23,41,.08);}
+    .splash-loader::after{background:linear-gradient(90deg,#0ea5a4,#22d3ee);}
     @keyframes pulseLogo{
-        0%{transform:scale(.92);box-shadow:0 0 22px rgba(123,140,255,.4);}
-        50%{transform:scale(1.08);box-shadow:0 0 46px rgba(123,140,255,.75),0 0 80px rgba(34,211,166,.5);}
-        100%{transform:scale(.92);box-shadow:0 0 22px rgba(123,140,255,.4);}
+        0%{transform:scale(.92);box-shadow:0 14px 30px -14px rgba(14,165,164,.5);}
+        50%{transform:scale(1.08);box-shadow:0 22px 48px -14px rgba(14,165,164,.85),0 0 60px rgba(34,211,238,.4);}
+        100%{transform:scale(.92);box-shadow:0 14px 30px -14px rgba(14,165,164,.5);}
     }
 
-    /* Carte solde : velours indigo, léger relief */
+    /* Carte principale : blanche, plus de bordure animee ni de halo */
+    .card{
+        background:var(--w-card);
+        border:1px solid var(--w-border);
+        box-shadow:0 26px 60px -34px rgba(20,40,80,.35);
+    }
+    .card::before,.card::after{display:none;}
+
+    /* Marque */
+    .wallet-title{color:var(--w-ink);}
+    .wallet-title span{background:linear-gradient(to right,#0ea5a4,#6366f1);}
+    .wallet-logo{box-shadow:0 14px 30px -18px rgba(14,165,164,.7);}
+
+    /* Barre du haut */
+    .topbar{color:var(--w-ink);}
+    .topbar-hello{color:var(--w-ink);}
+    .topbar-sub{color:var(--w-muted);}
+    .topbar-menu,.topbar-bell{background:var(--w-card-2);border:1px solid var(--w-border);}
+    .topbar-menu svg,.topbar-bell svg{stroke:var(--w-ink);}
+    .topbar-avatar{background:linear-gradient(135deg,#0ea5a4,#6366f1);border-color:#fff;box-shadow:0 8px 18px -10px rgba(14,165,164,.8);}
+
+    /* Carte solde : teal lumineux */
     .balance-card{
-        background:linear-gradient(135deg,rgba(123,140,255,.28),rgba(42,26,86,.5));
-        border-color:rgba(140,160,215,.28);
-        box-shadow:0 18px 44px -18px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.06);
+        background:linear-gradient(135deg,#0ea5a4,#0b8fae 55%,#6366f1);
+        border:none;
+        box-shadow:0 26px 50px -24px rgba(14,165,164,.7);
+        color:#fff;
     }
-    .balance-label b{ color:var(--w-accent); }
-    .balance-network-badge{ background:rgba(34,211,166,.12); border-color:rgba(34,211,166,.35); color:#8ff3cd; }
-    .balance-network-badge svg{ stroke:#8ff3cd; }
+    .balance-label{color:rgba(255,255,255,.85);}
+    .balance-label b{color:#c9fbff;}
+    .balance-amount{color:#fff;}
+    .balance-sub{color:rgba(255,255,255,.82);}
+    .balance-eye svg{stroke:rgba(255,255,255,.85);}
+    .balance-network-badge{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.35);color:#fff;}
+    .balance-network-badge svg{stroke:#fff;}
 
-    /* Boutons d'action */
+    /* Grille d'actions */
+    .actions-title{color:var(--w-muted);}
     .action-btn{
-        background:linear-gradient(135deg,rgba(123,140,255,.22),rgba(24,18,48,.65));
-        border-color:rgba(140,160,215,.22);
-        box-shadow:0 14px 32px -18px rgba(0,0,0,.8);
+        background:var(--w-card);border:1px solid var(--w-border);
+        color:var(--w-ink);box-shadow:0 12px 26px -20px rgba(20,40,80,.4);
     }
-    .action-btn:hover{
-        background:linear-gradient(135deg,rgba(123,140,255,.34),rgba(30,22,60,.75));
-        border-color:rgba(160,180,255,.4);
-    }
-    .action-icon.depot{ background:rgba(34,211,166,.16); }
-    .action-icon.depot svg{ stroke:#22d3a6; }
+    .action-btn:hover{background:#fff;border-color:rgba(14,165,164,.5);box-shadow:0 18px 30px -20px rgba(14,165,164,.7);}
+    .action-icon.depot{background:rgba(15,157,106,.12);}
+    .action-icon.depot svg{stroke:#0f9d6a;}
+    .action-icon.retrait{background:rgba(99,102,241,.12);}
+    .action-icon.retrait svg{stroke:#6366f1;}
+    .action-icon.transfert{background:rgba(14,165,164,.12);}
+    .action-icon.transfert svg{stroke:#0ea5a4;}
+    .action-icon.historique{background:rgba(217,119,6,.12);}
+    .action-icon.historique svg{stroke:#d97706;}
 
     /* Carte cours USDT */
-    .cours-card{
-        background:linear-gradient(135deg,rgba(123,140,255,.2),rgba(24,18,48,.62));
-        border-color:rgba(140,160,215,.22);
-    }
-    .cours-valeur{ color:#8ff3cd; }
-    .cours-badge.hausse{ background:rgba(34,211,166,.15); color:#8ff3cd; }
-    .cours-periode-btn.active{ background:rgba(123,140,255,.2); border-color:rgba(140,160,255,.45); color:#c9ccff; }
+    .cours-card{background:var(--w-card);border:1px solid var(--w-border);box-shadow:0 16px 34px -26px rgba(20,40,80,.4);}
+    .cours-title{color:var(--w-ink);}
+    .cours-refresh{color:var(--w-muted-2);}
+    .cours-valeur{color:var(--w-ok);}
+    .cours-badge.hausse{background:rgba(15,157,106,.12);color:#0b6b4a;}
+    .cours-badge.baisse{background:rgba(225,29,72,.1);color:#a3123a;}
+    .cours-badge.neutre{background:var(--w-card-2);color:var(--w-muted);}
+    .cours-axe,.cours-chart-labels{color:var(--w-muted-2);}
+    .cours-grid-line{stroke:rgba(20,40,80,.08);}
+    .cours-periode-btn{background:var(--w-card-2);border:1px solid var(--w-border);color:var(--w-muted);}
+    .cours-periode-btn.active{background:rgba(14,165,164,.12);border-color:rgba(14,165,164,.4);color:var(--w-primary);}
+    .cours-tooltip{background:#0e1729;border-color:rgba(14,165,164,.4);}
 
-    /* Topbar / avatar */
-    .topbar-avatar{ background:linear-gradient(135deg,#7b8cff,#a978ff); }
-    .topbar-menu,.topbar-bell{ background:rgba(140,160,215,.1); border-color:rgba(140,160,215,.18); }
+    /* Carte transactions */
+    .transactions-card{background:var(--w-card);border:1px solid var(--w-border);box-shadow:0 16px 34px -26px rgba(20,40,80,.4);}
+    .transactions-title{color:var(--w-ink);}
+    .transactions-voir-tout{color:var(--w-primary);}
 
-    /* Réseaux actifs : violet au lieu du rose */
+    /* Reseaux / adresses */
+    .wallet-section-title{color:var(--w-ink);}
+    .wallet-network-card{background:var(--w-card);border:1px solid var(--w-border);color:var(--w-ink);}
     .wallet-network-card:hover,
     .wallet-network-card.wallet-btn-network-active{
-        background:rgba(123,140,255,.14); border-color:#7b8cff; box-shadow:0 8px 25px rgba(123,140,255,.28);
+        background:rgba(14,165,164,.08);border-color:var(--w-primary);box-shadow:0 10px 24px -18px rgba(14,165,164,.7);
     }
+    .wallet-address-section,.wallet-address-box{background:var(--w-card-2);border-color:var(--w-border);color:var(--w-ink);}
+    .wallet-copy-button{background:linear-gradient(135deg,#0ea5a4,#22d3ee);box-shadow:0 10px 22px -14px rgba(14,165,164,.8);}
+    .wallet-address{color:var(--w-ink);}
     #radioBep20:checked ~ .wallet-network-cards #btnToggleBep20{
-        background:rgba(123,140,255,.14); border-color:#7b8cff; box-shadow:0 8px 25px rgba(123,140,255,.28);
+        background:rgba(14,165,164,.08);border-color:var(--w-primary);box-shadow:0 10px 24px -18px rgba(14,165,164,.7);
     }
-    #radioBep20:checked ~ .wallet-network-cards #btnToggleBep20 .wallet-network-arrow{ color:#7b8cff; }
+    #radioBep20:checked ~ .wallet-network-cards #btnToggleBep20 .wallet-network-arrow{color:var(--w-primary);}
 
-    /* Barre inférieure : verre indigo, actif violet */
+    /* Montant historique */
+    .amount-box{background:var(--w-card-2);border:1px solid var(--w-border);}
+    .amount-label{color:var(--w-muted);}
+    .amount{background:linear-gradient(180deg,#0ea5a4,#0b7d7c);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:none;}
+    .amount-sub{color:var(--w-primary);}
+    .wallet-stat{background:var(--w-card-2);border:1px solid var(--w-border);}
+    .wallet-stat small{color:var(--w-muted);}
+    .wallet-stat strong{color:var(--w-ok);}
+
+    /* Boutons generiques */
+    .wallet-btn-secondary{background:var(--w-card-2);border:1px solid var(--w-border);color:var(--w-ink);}
+    .wallet-btn-secondary:hover{background:#e9eef7;}
+    .wallet-btn-mvola{background:linear-gradient(90deg,#0ea5a4,#0b8fae);box-shadow:0 12px 26px -16px rgba(14,165,164,.8);}
+
+    /* Barre inferieure */
     .bottom-nav{
-        background:linear-gradient(180deg,rgba(16,20,40,.96),rgba(8,11,24,.99));
-        border-color:rgba(140,160,215,.16);
-        -webkit-backdrop-filter:blur(18px); backdrop-filter:blur(18px);
+        background:rgba(255,255,255,.94);
+        border:1px solid var(--w-border);border-bottom:none;
+        box-shadow:0 -10px 30px -22px rgba(20,40,80,.5);
+        -webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);
     }
-    .bottom-nav .nav-item.active{ color:#a978ff; text-shadow:0 0 12px rgba(169,120,255,.7); }
-    .bottom-nav .nav-item.active svg{ stroke:#a978ff; }
+    .bottom-nav .nav-item{color:var(--w-muted);}
+    .bottom-nav .nav-item svg{stroke:var(--w-muted);}
+    .bottom-nav .nav-item.active{color:var(--w-primary);text-shadow:none;}
+    .bottom-nav .nav-item.active svg{stroke:var(--w-primary);}
 
-    /* Boutons & modales harmonisés */
-    .wallet-btn-secondary{ background:rgba(140,160,215,.12); border-color:rgba(140,160,215,.2); }
-    .wallet-btn-secondary:hover{ background:rgba(140,160,215,.2); }
-    .historique-box{ background:#101528; }
+    /* Historique / modales */
+    .historique-overlay{background:rgba(14,23,41,.45);}
+    .historique-box{background:#fff;color:var(--w-ink);}
+    .historique-header h3{color:var(--w-ink);}
+    .historique-close{background:var(--w-card-2);color:var(--w-ink);}
+    .historique-filtre-btn{background:var(--w-card-2);border:1px solid var(--w-border);color:var(--w-muted);}
+    .historique-filtre-btn.actif,.historique-filtre-btn.active{background:rgba(14,165,164,.12);border-color:rgba(14,165,164,.4);color:var(--w-primary);}
+    .historique-statut.confirme{background:rgba(15,157,106,.12);color:#0b6b4a;}
+    .historique-statut.en_attente{background:rgba(217,119,6,.12);color:#8a5200;}
+    .historique-statut.rejete{background:rgba(225,29,72,.1);color:#a3123a;}
+
+    /* Selecteur de langue */
+    .lang-switch{background:rgba(255,255,255,.92);border:1px solid var(--w-border);box-shadow:0 8px 20px -14px rgba(20,40,80,.5);}
+    .lang-switch .lang-opt{color:var(--w-muted);}
+    .lang-switch .lang-opt.active{background:linear-gradient(135deg,#0ea5a4,#22d3ee);color:#fff;}
     </style>
 </head>
 <body>
