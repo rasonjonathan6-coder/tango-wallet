@@ -47,3 +47,30 @@ find . -name "*.php" -print0 | xargs -0 -n1 php -l
   cron/diag) et identifiants passent par des variables d'environnement
   (`getenv()`), documentées dans `.env.example`.
 - Ne jamais committer `.env`, ni les fichiers `*.log`.
+
+## Mise a jour 2026-10-11 : UI, Google, taux, Android
+
+### Hebergement
+- Port 12000 : base `wallet` (historique).
+- Port 12001 : base `wallet_android` (dediee Android) — env dans `/tmp/wallet_android_env.sh` (hors git).
+- Utilisateur MariaDB `walletapp` / base `wallet_android`, accessible en TCP.
+
+### APK Android (WebView)
+- Projet : `/workspace/android-wallet-app` (package `com.tango.wallet`).
+- MainActivity charge directement `<base>/wallet/portefeuille.php` ; User-Agent suffixe `MonAppAndroid/1.0`.
+- SettingsActivity permet de changer l'URL d'hebergement (`wallet_prefs/base_url`).
+- Build : `gradle :app:assembleDebug` (JDK 21, SDK `/home/openhands/android-sdk`).
+- Conflit Kotlin resolu par `implementation platform('org.jetbrains.kotlin:kotlin-bom:1.8.22')`.
+
+### Connexion Google
+- Cablee dans `index.php` (`?page=google_callback`) : e-mail Google verifie = proprietaire du portefeuille.
+- Requiert GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET / GOOGLE_REDIRECT_URI (sinon bouton masque).
+- Redirect URI : `https://<domaine>/?page=google_callback`.
+
+### Taux USDT/MGA
+- `wallet/taux.php` : Binance P2P (tradeType SELL) moins marge 200 Ar ; cache 30 min.
+- `wallet/cron_update_taux.php` : cron `*/30 * * * *`.
+- Repli conteneur sans crontab : `wallet/run_taux_loop.sh` (boucle 30 min).
+
+### Verification depots
+- Webhook `wallet/webhook_plisio.php` : HMAC sha1 (ksort + serialize des POST), idempotent (txid), credite `user_wallets.solde`.
