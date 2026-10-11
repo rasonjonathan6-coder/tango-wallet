@@ -21,7 +21,7 @@ define("CRON_SECRET_TOKEN", getenv('CRON_SECRET_TOKEN') ?: '');
 
 $tokenRecu = $_GET['token'] ?? '';
 
-if(!hash_equals(CRON_SECRET_TOKEN, $tokenRecu)){
+if (CRON_SECRET_TOKEN === '' || !hash_equals(CRON_SECRET_TOKEN, $tokenRecu)) {
     http_response_code(403);
     exit("forbidden");
 }

@@ -20,7 +20,7 @@ define("VIEW_LOG_SECRET_TOKEN", getenv('VIEW_LOG_SECRET_TOKEN') ?: '');
 
 $tokenRecu = $_GET['token'] ?? '';
 
-if(!hash_equals(VIEW_LOG_SECRET_TOKEN, $tokenRecu)){
+if (VIEW_LOG_SECRET_TOKEN === '' || !hash_equals(VIEW_LOG_SECRET_TOKEN, $tokenRecu)) {
     http_response_code(403);
     exit("forbidden");
 }

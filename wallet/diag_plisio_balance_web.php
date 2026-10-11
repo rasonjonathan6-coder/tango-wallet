@@ -22,7 +22,7 @@ define("DIAG_PLISIO_BALANCE_TOKEN", getenv('DIAG_PLISIO_BALANCE_TOKEN') ?: '');
 
 $tokenRecu = $_GET['token'] ?? '';
 
-if(!hash_equals(DIAG_PLISIO_BALANCE_TOKEN, $tokenRecu)){
+if (DIAG_PLISIO_BALANCE_TOKEN === '' || !hash_equals(DIAG_PLISIO_BALANCE_TOKEN, $tokenRecu)) {
     http_response_code(403);
     exit("forbidden");
 }

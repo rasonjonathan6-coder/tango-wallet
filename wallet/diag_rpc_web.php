@@ -21,7 +21,7 @@ define("DIAG_RPC_SECRET_TOKEN", getenv('DIAG_SECRET_TOKEN') ?: '');
 
 $tokenRecu = $_GET['token'] ?? '';
 
-if(!hash_equals(DIAG_RPC_SECRET_TOKEN, $tokenRecu)){
+if (DIAG_RPC_SECRET_TOKEN === '' || !hash_equals(DIAG_RPC_SECRET_TOKEN, $tokenRecu)) {
     http_response_code(403);
     exit("forbidden");
 }

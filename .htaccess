@@ -19,9 +19,19 @@
 
 # Scripts de maintenance / diagnostic : jamais accessibles par le web.
 # (Le webhook Plisio et les pages client restent volontairement ouverts.)
-<FilesMatch "^(diag_|fix_|audit_|cron_|check_wallet_deposits)">
+# Exception : cron_http.php et log_taux_historique.php sont joignables par le
+# web cron (cron-job.org), proteges par leur propre jeton CRON_SECRET.
+<FilesMatch "^(diag_|fix_|audit_|check_wallet_deposits|plisio_status|webhook_plisio_diag)">
     Require all denied
 </FilesMatch>
+
+<Files "cron_http.php">
+    Require all granted
+</Files>
+
+<Files "log_taux_historique.php">
+    Require all granted
+</Files>
 
 # --- 2. En-têtes de sécurité --------------------------------
 <IfModule mod_headers.c>

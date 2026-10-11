@@ -12,14 +12,13 @@
 require_once "../config.php";
 require_once "taux.php";
 
-// Sécurité minimale : à activer si besoin en définissant CRON_SECRET
-// dans config.php, puis en appelant ce script avec ?secret=...
-if (defined('CRON_SECRET') && CRON_SECRET !== '') {
-    if (!isset($_GET['secret']) || !hash_equals(CRON_SECRET, $_GET['secret'])) {
-        http_response_code(403);
-        echo "Accès refusé.";
-        exit;
-    }
+// Securite : fail-closed. Definir CRON_SECRET (env CRON_SECRET) puis appeler
+// ce script avec ?secret=... . Sans secret configure, l'acces est refuse.
+$secretAttendu = getenv('CRON_SECRET') ?: '';
+if ($secretAttendu === '' || !isset($_GET['secret']) || !hash_equals($secretAttendu, $_GET['secret'])) {
+    http_response_code(403);
+    echo "Accès refusé.";
+    exit;
 }
 
 $taux = getTauxActuel($pdo);
