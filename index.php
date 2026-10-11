@@ -271,8 +271,21 @@ if ($page === 'google_callback') {
                 } else {
                     $insert = $pdo->prepare("INSERT INTO users (email, password, verified, google_id, created_at) VALUES (?, ?, 1, ?, ?)");
                     $insert->execute([$google_email, password_hash(bin2hex(random_bytes(16)), PASSWORD_DEFAULT), $google_id, date('Y-m-d H:i:s')]);
+                    $nouvel_id = (int) $pdo->lastInsertId();
+
+                    $pdo->prepare("INSERT INTO user_wallets (user_id, solde, statut, created_at) VALUES (?,0,'actif',NOW())")
+                        ->execute([$nouvel_id]);
+
+                    // Distribution automatique des adresses de depot Plisio (BEP20).
+                    if (file_exists(__DIR__ . '/wallet/wallet_functions.php')) {
+                        require_once __DIR__ . '/wallet/wallet_functions.php';
+                    }
+                    if (function_exists('provisionnerAdressesDepot')) {
+                        provisionnerAdressesDepot($pdo, $nouvel_id);
+                    }
+
                     $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
-                    $stmt->execute([$pdo->lastInsertId()]);
+                    $stmt->execute([$nouvel_id]);
                     $user = $stmt->fetch(PDO::FETCH_ASSOC);
                 }
             }

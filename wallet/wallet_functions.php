@@ -214,4 +214,52 @@ function ensureUserBep20Addresses($pdo, $user_id, $nombre = 10){
 
 }
 
+
+/**
+ * Provisionne automatiquement les adresses de depot d'un nouvel utilisateur.
+ *
+ * Garantit la ligne user_wallets, genere les 10 adresses BEP20 via Plisio
+ * (uid "user_id-bep20-N") et renseigne wallet_bep20 (adresse d'affichage =
+ * premier slot) si elle est vide.
+ *
+ * Idempotent : ne regenere jamais un slot deja present. Ne lance jamais
+ * d'exception (les echecs Plisio sont journalises) pour ne pas casser une
+ * inscription si l'API distante est indisponible.
+ */
+function provisionnerAdressesDepot($pdo, $user_id, $nombre = 10){
+
+    $user_id = (int) $user_id;
+    if($user_id <= 0){
+        return false;
+    }
+
+    try {
+
+        $stmt = $pdo->prepare("SELECT id FROM user_wallets WHERE user_id=? LIMIT 1");
+        $stmt->execute([$user_id]);
+        if(!$stmt->fetchColumn()){
+            $pdo->prepare("INSERT INTO user_wallets (user_id, solde, statut, created_at) VALUES (?,0,'actif',NOW())")
+                ->execute([$user_id]);
+        }
+
+        $adresses = ensureUserBep20Addresses($pdo, $user_id, $nombre);
+
+        if(!empty($adresses)){
+            $stmt = $pdo->prepare("SELECT wallet_bep20 FROM user_wallets WHERE user_id=? LIMIT 1");
+            $stmt->execute([$user_id]);
+            if(!trim((string) $stmt->fetchColumn())){
+                $pdo->prepare("UPDATE user_wallets SET wallet_bep20=? WHERE user_id=?")
+                    ->execute([$adresses[0]['adresse'], $user_id]);
+            }
+        }
+
+        return true;
+
+    } catch (\Throwable $e) {
+        error_log("provisionnerAdressesDepot user_id=".$user_id." : ".$e->getMessage());
+        return false;
+    }
+
+}
+
 ?>

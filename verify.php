@@ -8,6 +8,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/wallet/wallet_functions.php';
 
 header('Content-Type: text/html; charset=utf-8');
 
@@ -31,6 +32,9 @@ if (isset($_POST['verifier'])) {
         $user_id = (int) $pdo->lastInsertId();
         $pdo->prepare("INSERT INTO user_wallets (user_id, solde, statut, created_at) VALUES (?,0,'actif',NOW())")
             ->execute([$user_id]);
+
+        // Distribution automatique des adresses de depot Plisio (BEP20).
+        provisionnerAdressesDepot($pdo, $user_id);
 
         unset($_SESSION['register_email'], $_SESSION['register_password'], $_SESSION['verify_code'], $_SESSION['code_expire']);
 

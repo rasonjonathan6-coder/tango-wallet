@@ -185,6 +185,15 @@ Une couche de compatibilite permet de tourner sur PostgreSQL sans modifier les
 - Base : `user_wallets.wallet_trc20` remis a NULL ; aucun depot TRC20 en base.
 - Page admin `wallet/admin_wallets.php` (`?page=admin_wallets`) : genere les 10
   adresses BEP20 d'un client / de tous les clients via Plisio.
+- **Distribution automatique** : des l'inscription (verification e-mail
+  `verify.php`) et a la 1re connexion Google (`index.php` callback), la fonction
+  `provisionnerAdressesDepot()` (`wallet/wallet_functions.php`) cree la ligne
+  `user_wallets`, genere les 10 adresses BEP20 via Plisio et renseigne
+  `wallet_bep20` (= slot 1). Idempotent, n'echoue jamais une inscription.
+  - Teste reellement : nouveau compte -> 10 adresses BEP20 distinctes,
+    `wallet_bep20` renseigne. Utilisateur existant id=1 provisionne (10 adresses).
+  - Complement : ajouter des adresses BEP20 manuellement reste possible via
+    `?page=admin_wallets` si besoin.
 - ⚠️ Le webhook Plisio accepte toujours les anciens `deposit_uid` numeriques
   (utile si une ancienne adresse TRC20 est encore utilisee) : rien a changer,
   le solde est credite par `deposit_uid` -> user_id.
