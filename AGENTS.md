@@ -233,25 +233,29 @@ Une couche de compatibilite permet de tourner sur PostgreSQL sans modifier les
 - `https://tango-wallet.onrender.com/wallet/cron_update_taux.php?token=<CRON_SECRET_TOKEN>` (toutes les 30 min)
 - `https://tango-wallet.onrender.com/wallet/log_taux_historique.php?secret=<CRON_SECRET>` (toutes les 30-60 min)
 
-## Design system de l'interface (ÂŦ Aurora Âŧ, 2026)
-- Feuille de style maitresse : `admin_style.css` (racine), chargee par
-  `index.php`, `verify.php`, `go.php` et les pages `wallet/admin_*.php`.
-- Jetons CSS dans `:root` : `--bg`, `--surface`, `--border`, `--primary`
-  (#7b8cff), `--primary-2` (#a978ff), `--accent` (#22d3a6), `--ok`, `--err`,
-  `--radius`, `--radius-sm`, `--shadow`, `--grad`, `--grad-accent`.
-- Composants : `.topbar`, `.container`, `.card` (+ `.center`), `.form`/`.field`,
-  `.btn` (+ `.secondary`/`.danger`/`.accent`/`.block`), `.btn-google`, `.alert`
-  (+ `.ok`/`.err`), `.grid`/`.tile`, `.sep`, `.footer`, `.lock-card`,
-  `.admin-*`, `.hero-*`, `.eyebrow`.
+## Design system de l'interface (theme clair « Fintech », 2026)
+- Feuille maitresse : `admin_style.css` (racine), chargee par `index.php`,
+  `verify.php`, `go.php` et les pages `wallet/admin_*.php`.
+- Theme CLAIR : canvas `#f2f5fa`, cartes blanches `#ffffff`, bordures `#e2e8f2`,
+  encre `#0e1729`. Halos doux teal/indigo en fond + trame de points masquee.
+- Jetons CSS `:root` : `--bg`, `--surface`, `--surface-2/3`, `--border`,
+  `--border-strong`, `--text`, `--muted`, `--primary` (#0ea5a4), `--primary-2`
+  (#22d3ee), `--accent` (#6366f1), `--ok`, `--err`, `--warn`, `--radius`,
+  `--radius-sm`, `--shadow`, `--shadow-soft`, `--ring`, `--grad`, `--grad-accent`.
+- Composants : `.topbar`/`.brand`, `.container`, `.card` (+ `.center`), `.form`/
+  `.field`, `input/textarea/select` (focus anneau teal), `.btn` (+ `.secondary`/
+  `.danger`/`.accent`/`.block`, reflet au survol), `.btn-google`, `.alert`
+  (+ `.ok`/`.err`), `.grid`/`.tile`, `.sep`, `.check`, `.footer`, `.lock-*`,
+  `.admin-*` (`.admin-nav` en pilules), `.hero-*`, `.eyebrow`.
 - Barre de navigation mobile `.tabbar` : visible <= 640px, affichee dans
   `index.php` quand `$_SESSION['user_id']` est defini (classe `has-tabbar`).
-- `wallet/portefeuille.php` possede son CSS inline (glassmorphism) + un bloc
-  final ÂŦ Harmonisation Aurora Âŧ qui aligne la palette sur indigo/violet
-  (bordure animee adoucie, carte solde, actions, cours, bottom-nav).
-- Palette : indigo/violet pour les actions, menthe/vert pour les valeurs
-  positives et les depots. Evite le rose flashy `#ff2ea6` pour l'UI chrome.
-- Les libelles de formulaire utilisent `<label for>` + `autocomplete` (pas
-  seulement des placeholders).
+- `wallet/portefeuille.php` : CSS inline (glassmorphism d'origine) + un bloc
+  final « Theme clair Fintech » qui convertit tout le portefeuille en clair
+  (fond, carte blanche sans bordure animee, balance teal lumineux, actions,
+  cours USDT, reseaux/adresses, bottom-nav, modales historique, selecteur de
+  langue). `<meta name="theme-color">` passe a `#f2f5fa`.
+- Palette : teal/cyan pour les actions, indigo en accent, vert pour les valeurs
+  positives et les depots, rouge pour les erreurs. Plus de rose `#ff2ea6`.
 
 ## Deploiement Render
 - Service : `tango-wallet` — id `srv-db5l3rbbc2fs7399arlg` (region Frankfurt,
