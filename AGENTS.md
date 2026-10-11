@@ -257,6 +257,20 @@ Une couche de compatibilite permet de tourner sur PostgreSQL sans modifier les
 - Palette : teal/cyan pour les actions, indigo en accent, vert pour les valeurs
   positives et les depots, rouge pour les erreurs. Plus de rose `#ff2ea6`.
 
+## Pieges de portabilite SQL (MySQL -> PostgreSQL)
+- La couche `wallet/db.php` traduit seulement `INSERT IGNORE`,
+  `ON DUPLICATE KEY UPDATE` et neutralise les `CREATE TABLE`. Elle ne traduit
+  PAS `INTERVAL` ni `NOW()`.
+- ⚠️ `INTERVAL ? HOUR` (avec parametre lie) est INVALIDE en PostgreSQL :
+  erreur `42601 syntax error at or near "$1"`. Utiliser
+  `NOW() - make_interval(hours => ?)` sous pgsql. C'etait la cause du
+  graphique du portefeuille reste vide (endpoint `get_taux_historique.php`).
+- Regle : eviter les intervalles parametres MySQL. Toujours choisir la variante
+  selon `$pdo->getAttribute(PDO::ATTR_DRIVER_NAME)`.
+- Base de prod : projet Supabase `tango-wallet` (eu-central-1, ref
+  `bwnnfemkyakgnjbnakja`), atteignable en lecture via l'API de gestion
+  Supabase (`SUPABASE_ACCESS_TOKEN`).
+
 ## Deploiement Render
 - Service : `tango-wallet` — id `srv-db5l3rbbc2fs7399arlg` (region Frankfurt,
   runtime Docker, branche `main`, autoDeploy actif).
