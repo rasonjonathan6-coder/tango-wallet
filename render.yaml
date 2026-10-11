@@ -1,15 +1,25 @@
 # ============================================================================
 # Blueprint Render (offre gratuite) pour Tango Wallet.
 #
-# 1. Poussez ce depot sur GitHub.
-# 2. Render -> New + -> Blueprint -> selectionnez ce depot.
-# 3. Renseignez les variables marquees "sync: false" (base MySQL externe,
-#    Google, Plisio) dans le tableau de bord Render.
+# Render ne propose pas de MySQL managé : l'application tourne donc sur
+# PostgreSQL (offert gratuitement par Render). Le code PHP est resté écrit pour
+# MySQL ; la couche wallet/db.php traduit les requêtes automatiquement, aucune
+# modification du code n'est nécessaire.
 #
-# Limites de l'offre gratuite Render : le service se met en veille apres
-# 15 min sans trafic (il redemarre a la 1re visite) et Render ne fournit pas
-# de base MySQL : utilisez une base MySQL gratuite externe (db4free.net).
+# 1. Poussez ce dépôt sur GitHub.
+# 2. Render -> New + -> Blueprint -> sélectionnez ce dépôt.
+# 3. Renseignez les variables marquées "sync: false" (Google, Plisio, admin).
+#
+# Le schéma PostgreSQL est importé automatiquement au premier démarrage
+# (schema_pg.sql) : aucune étape manuelle d'import de base.
 # ============================================================================
+databases:
+  - name: tango-wallet-db
+    databaseName: wallet
+    user: wallet
+    plan: free
+    region: frankfurt
+
 services:
   - type: web
     name: tango-wallet
@@ -21,17 +31,13 @@ services:
     envVars:
       - key: APP_ENV
         value: production
-      - key: DB_PORT
-        value: "3306"
-      # --- Base MySQL externe (a renseigner dans Render) ---
-      - key: DB_HOST
-        sync: false
-      - key: DB_NAME
-        sync: false
-      - key: DB_USER
-        sync: false
-      - key: DB_PASS
-        sync: false
+      - key: DB_DRIVER
+        value: pgsql
+      # Connexion à la base PostgreSQL gérée par Render (interne, même région).
+      - key: DB_URL
+        fromDatabase:
+          name: tango-wallet-db
+          property: connectionString
       # --- Secrets applicatifs (a renseigner dans Render) ---
       - key: ADMIN_PASSWORD
         sync: false
