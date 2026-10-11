@@ -127,3 +127,19 @@ Une couche de compatibilite permet de tourner sur PostgreSQL sans modifier les
 - Render n'auto-deploie pas toujours apres un changement de variables : forcer
   via `POST /v1/services/<id>/deploys` si le commit live ne bouge pas.
 
+## Mise a jour 2026-10-11 (c) : Plisio operationnel
+
+- `PLISIO_SECRET_KEY` configuree sur Render. **Format** : la vraie cle fait
+  64 caracteres, de la forme `<32 hex>_<16 alphanum>` (ex:
+  `fl49mtHMQz9lChQeuvEVBabE5DriJ3JHUE6fW6uV42MmcE4_BtVdLeyEMfEUi0ru`).
+  La tronquer aux 32 premiers caracteres -> API Plisio repond **401
+  invalid credentials** (le webhook, lui, valide alors des signatures fausses).
+- Verifie en prod : `/balances/USDT_TRX`, `/balances/USDT_BSC`, `/operations`,
+  `/shops/deposit/new` (white-label, renvoie `hash` = adresse) -> `success`.
+- Webhook signe (HMAC-SHA1 sur `serialize()` du POST trie) valide en ligne :
+  bonne cle -> 200, mauvaise cle -> 422.
+- Cote Plisio (dashboard) : Status URL =
+  `https://tango-wallet.onrender.com/wallet/webhook_plisio.php` ; laisser le
+  champ **Request IP vide** (les IP sortantes Render gratuites sont partagees
+  et variables ; une IP fixe Render coute ~100 $/mois).
+
