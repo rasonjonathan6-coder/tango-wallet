@@ -269,6 +269,24 @@ Une couche de compatibilite permet de tourner sur PostgreSQL sans modifier les
   `.htaccess` (`RewriteRule ^wallet/index\.php$ - [F]`). Ne pas le confondre
   avec l'app active.
 
+## Application Android (APK)
+- Source : `android-app/` (WebView, package `com.tango.wallet`). Le
+  `app/build.gradle` etait ABSENT du depot d'origine -> recree.
+- URL par defaut dans `SettingsActivity.DEFAULT_URL` : DOIT pointer sur la
+  prod (`https://tango-wallet.onrender.com`). Un ancien APK embarque un hote
+  de dev `work-*.prod-runtime.all-hands.dev` (mort, 502) : l'app restait
+  blanche. Ne jamais remettre un hote de dev.
+- Theme `Theme.Wallet` = `DarkActionBar` (pas `NoActionBar`) sinon le menu
+  overflow (Actualiser / Changer d'hebergement) est invisible.
+- APK servi par l'app : `GET /?download=apk` (route dans `index.php`,
+  `downloads/tango-wallet.apk`). `downloads/` n'est plus exclu du
+  `.dockerignore` et `!downloads/*.apk` a ete ajoute au `.gitignore`.
+  Miroir : `https://raw.githubusercontent.com/<repo>/main/downloads/tango-wallet.apk`.
+- Build : JDK 17+ (21 OK), Android SDK 34, Gradle 8.7. Signature release via
+  keystore gitignore, mots de passe dans `TANGO_KEYSTORE_PASSWORD` /
+  `TANGO_KEY_PASSWORD`. L'API GitHub du token ne permet PAS de creer une
+  release (403) : publier l'APK via le depot + `/ ?download=apk`.
+
 ## Pieges de portabilite SQL (MySQL -> PostgreSQL)
 - La couche `wallet/db.php` traduit seulement `INSERT IGNORE`,
   `ON DUPLICATE KEY UPDATE` et neutralise les `CREATE TABLE`. Elle ne traduit

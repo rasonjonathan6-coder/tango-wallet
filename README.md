@@ -10,7 +10,7 @@ schéma de base de données, contrôleur frontal) ont été réécrits.
 
 ## Téléchargements
 
-- **APK Android** : [tango-wallet-v1.0.0.apk](https://github.com/rasonjonathan6-coder/tango-wallet/releases/download/v1.0.0/tango-wallet-v1.0.0.apk)
+- **APK Android (v1.1, recommandee)** : [tango-wallet.apk](https://tango-wallet.onrender.com/?download=apk)
 - **Application Android (source)** : dossier [`android-app/`](android-app/)
 
 ## Mise en production
