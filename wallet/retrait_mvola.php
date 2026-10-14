@@ -8,6 +8,9 @@ if(!isset($_SESSION['user_id'])){
     exit;
 }
 
+require_once "config.php";
+require_once "plisio_api.php";
+require_once "wallet_functions.php";
 require_once "taux.php";
 
 // BEP20 uniquement (TRC20 retiré : frais Plisio trop élevés pour le client).
