@@ -286,6 +286,17 @@ Une couche de compatibilite permet de tourner sur PostgreSQL sans modifier les
   keystore gitignore, mots de passe dans `TANGO_KEYSTORE_PASSWORD` /
   `TANGO_KEY_PASSWORD`. L'API GitHub du token ne permet PAS de creer une
   release (403) : publier l'APK via le depot + `/ ?download=apk`.
+- L'app charge `wallet/portefeuille.php` EN DIRECT (pas `/?page=portefeuille`).
+  Les pages `wallet/portefeuille.php` et `wallet/retrait_mvola.php` doivent donc
+  etre AUTONOMES :
+  - chemins ABSOLUS obligatoires pour tout ce qui est resolu par le navigateur
+    (`/wallet/get_*.php`, `/wallet/historique.php`, `/?page=...`, `/logo*.png`).
+    En relatif, depuis `/wallet/...` ils resolvent en `/wallet/wallet/...` -> 404
+    et les blocs AJAX restent bloques sur « Chargement... ».
+  - includes explicites : `retrait_mvola.php` doit inclure `config.php` (sinon
+    `$pdo` est null en acces direct -> Fatal error ligne 89).
+  - redirections PHP en absolu (`Location: /?page=dashboard`), sinon depuis
+    `/wallet/...` elles retombent sur l'ancien monolithe `/wallet/index.php`.
 
 ## Pieges de portabilite SQL (MySQL -> PostgreSQL)
 - La couche `wallet/db.php` traduit seulement `INSERT IGNORE`,
