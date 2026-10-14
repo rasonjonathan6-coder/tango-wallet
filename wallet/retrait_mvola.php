@@ -678,6 +678,130 @@ $solde_usdt = number_format(floor(soldeAfficheDepuisBrut((float)($wallet['solde'
         color: #1c1c28;
         box-shadow: 0 3px 8px rgba(0,0,0,.25);
     }
+
+    /* ============================================================
+       Theme clair « Fintech » (2026) — aligne le retrait Mvola sur
+       le portefeuille : canvas lumineux, carte blanche, accent
+       teal/cyan/indigo. Remplace l'ancien theme sombre a fond image.
+       ============================================================ */
+    :root{
+        --w-bg:#f2f5fa;
+        --w-card:#ffffff;
+        --w-card-2:#f7f9fd;
+        --w-border:#e2e8f2;
+        --w-border-strong:#cbd5e8;
+        --w-ink:#0e1729;
+        --w-muted:#5b6b88;
+        --w-muted-2:#8b98b3;
+        --w-primary:#0ea5a4;
+        --w-cyan:#22d3ee;
+        --w-indigo:#6366f1;
+        --w-ok:#0f9d6a;
+        --w-err:#e11d48;
+        --w-warn:#d97706;
+    }
+    html,body{background-color:var(--w-bg);}
+    body{
+        background-image:none;
+        background:linear-gradient(180deg,#eef3fb 0%,#f2f5fa 60%,#f0f4fb 100%);
+        color:var(--w-ink);
+        font-family:"Inter","SF Pro Display",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    }
+    .card{
+        background:var(--w-card);
+        border:1px solid var(--w-border);
+        border-radius:24px;
+        max-width:560px;
+        box-shadow:0 26px 60px -34px rgba(20,40,80,.35);
+    }
+    .card::before,.card::after{display:none;}
+
+    .wallet-title{color:var(--w-ink);}
+    .wallet-title span{
+        background:linear-gradient(to right,#0ea5a4,#6366f1);
+        -webkit-background-clip:text;background-clip:text;
+        -webkit-text-fill-color:transparent;color:transparent;
+    }
+    .wallet-logo{background:#fff;box-shadow:0 14px 30px -18px rgba(14,165,164,.7);}
+
+    .amount-box{
+        background:var(--w-card-2);
+        border:1px solid var(--w-border);
+        border-radius:16px;
+        box-shadow:none;
+    }
+    .amount-label{color:var(--w-muted);}
+    .amount{
+        background:linear-gradient(180deg,#0ea5a4,#0b7d7c);
+        -webkit-background-clip:text;background-clip:text;
+        -webkit-text-fill-color:transparent;color:transparent;filter:none;
+    }
+
+    .retrait-form label{color:var(--w-ink);}
+    .retrait-form input,.retrait-form select,.wallet-input{
+        background:var(--w-card-2);
+        border:1px solid var(--w-border);
+        color:var(--w-ink);
+        border-radius:12px;
+        padding:11px 13px;
+    }
+    .wallet-input{display:flex;align-items:center;font-size:12.5px;font-weight:600;min-height:42px;}
+    .retrait-form input::placeholder{color:var(--w-muted-2);}
+    .retrait-form select option{background:#fff;color:var(--w-ink);}
+    .retrait-form input:focus,.retrait-form select:focus{
+        border-color:var(--w-primary);
+        box-shadow:0 0 0 3px rgba(14,165,164,.15);
+        background:#fff;
+    }
+    .retrait-form input.input-erreur{
+        border-color:var(--w-err)!important;
+        box-shadow:0 0 0 3px rgba(225,29,72,.15)!important;
+    }
+    .form-group small{color:var(--w-muted)!important;}
+    #btnTousMontant{
+        background:var(--w-card-2)!important;
+        color:var(--w-primary)!important;
+        border:1px solid var(--w-border)!important;
+        border-radius:12px!important;
+        font-weight:800!important;
+    }
+
+    .retrait-conversion{
+        background:var(--w-card-2);
+        border:1px solid var(--w-border);
+        border-radius:14px;
+    }
+    .retrait-conversion-row{color:var(--w-muted);}
+    .retrait-conversion-row span:last-child{color:var(--w-ink);}
+    .retrait-conversion-total{border-top:1px dashed var(--w-border-strong);}
+    .retrait-conversion-total span:first-child{color:var(--w-ink);}
+    .retrait-conversion-total span:last-child{color:var(--w-ok);text-shadow:none;font-weight:900;}
+
+    .retrait-succes{background:rgba(15,157,106,.12);border:1px solid rgba(15,157,106,.35);color:#0b6b4a;}
+    .retrait-erreur{background:rgba(225,29,72,.1);border:1px solid rgba(225,29,72,.3);color:#a3123a;}
+
+    .wallet-btn{border-radius:14px;padding:13px;font-weight:800;}
+    .wallet-btn-mvola{background:linear-gradient(90deg,#0ea5a4,#0b8fae);box-shadow:0 12px 26px -16px rgba(14,165,164,.8);color:#fff;}
+    .wallet-btn-mvola:hover{transform:translateY(-1px);}
+    .wallet-btn-secondary{background:var(--w-card-2);border:1px solid var(--w-border);color:var(--w-ink);}
+    .wallet-btn-secondary:hover{background:#e9eef7;}
+
+    .bottom-nav{
+        background:rgba(255,255,255,.94);
+        border:1px solid var(--w-border);border-bottom:none;
+        box-shadow:0 -10px 30px -22px rgba(20,40,80,.5);
+        -webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);
+    }
+    .bottom-nav .nav-item{color:var(--w-muted);}
+    .bottom-nav .nav-item svg{stroke:var(--w-muted);}
+    .bottom-nav .nav-item.active{color:var(--w-primary);text-shadow:none;}
+    .bottom-nav .nav-item.active svg{stroke:var(--w-primary);}
+
+    .lang-switch{background:rgba(255,255,255,.92);border:1px solid var(--w-border);box-shadow:0 8px 20px -14px rgba(20,40,80,.5);}
+    .lang-switch .lang-opt{color:var(--w-muted);}
+    .lang-switch .lang-opt.active{background:linear-gradient(135deg,#0ea5a4,#22d3ee);color:#fff;box-shadow:0 6px 16px -8px rgba(14,165,164,.8);}
+
+    button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--w-primary);outline-offset:2px;}
     </style>
 </head>
 <body>

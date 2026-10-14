@@ -1507,6 +1507,11 @@ $coursCarte = $tauxAffiche > 0
     .lang-switch{background:rgba(255,255,255,.92);border:1px solid var(--w-border);box-shadow:0 8px 20px -14px rgba(20,40,80,.5);}
     .lang-switch .lang-opt{color:var(--w-muted);}
     .lang-switch .lang-opt.active{background:linear-gradient(135deg,#0ea5a4,#22d3ee);color:#fff;}
+
+    /* Finitions modernes : transitions douces + focus accessible */
+    .action-btn,.wallet-btn,.cours-periode-btn,.historique-filtre-btn,.transactions-voir-tout,.bottom-nav .nav-item{transition:transform .2s ease,box-shadow .2s ease,background .2s ease,border-color .2s ease,color .2s ease;}
+    button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--w-primary);outline-offset:2px;}
+    @media (prefers-reduced-motion:reduce){*{animation-duration:.001ms!important;transition-duration:.001ms!important;}}
     </style>
 </head>
 <body>
