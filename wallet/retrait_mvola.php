@@ -4,7 +4,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 if(!isset($_SESSION['user_id'])){
-    header("Location:?page=dashboard");
+    header("Location: /?page=dashboard");
     exit;
 }
 
@@ -690,7 +690,7 @@ $solde_usdt = number_format(floor(soldeAfficheDepuisBrut((float)($wallet['solde'
 
         <div class="wallet-header">
             <h2 class="wallet-title"><span data-fr="Retrait vers" data-en="Withdraw to">Retrait vers</span> <span>Mvola</span></h2>
-            <img src="logousdtmvola.png" alt="USDT Mvola" class="wallet-logo">
+            <img src="/logousdtmvola.png" alt="USDT Mvola" class="wallet-logo">
         </div>
 
         <div class="amount-box">
@@ -767,22 +767,22 @@ $solde_usdt = number_format(floor(soldeAfficheDepuisBrut((float)($wallet['solde'
         <?php endif; ?>
 
         <div class="wallet-actions">
-            <a href="?page=portefeuille" class="wallet-btn wallet-btn-secondary" data-fr="Retour au portefeuille" data-en="Back to wallet">Retour au portefeuille</a>
+            <a href="/?page=portefeuille" class="wallet-btn wallet-btn-secondary" data-fr="Retour au portefeuille" data-en="Back to wallet">Retour au portefeuille</a>
         </div>
 
     </div>
 </div>
 
 <div class="bottom-nav">
-    <a href="?page=dashboard" class="nav-item">
+    <a href="/?page=dashboard" class="nav-item">
         <svg fill="none" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
         <span data-fr="Accueil" data-en="Home">Accueil</span>
     </a>
-    <a href="portefeuille.php" class="nav-item active">
+    <a href="/?page=portefeuille" class="nav-item active">
         <svg fill="none" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a2 2 0 002-2V7a2 2 0 00-2-2H6a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
         <span data-fr="Wallet" data-en="Wallet">Wallet</span>
     </a>
-    <a href="?page=compte" class="nav-item">
+    <a href="/?page=compte" class="nav-item">
         <svg fill="none" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
         <span data-fr="Compte" data-en="Account">Compte</span>
     </a>
@@ -793,7 +793,7 @@ let tauxClient = null;
 
 async function chargerTaux(){
     try{
-        const res = await fetch("wallet/get_taux.php");
+        const res = await fetch("/wallet/get_taux.php");
         const data = await res.json();
         if(data.taux_client){
             tauxClient = data.taux_client;
@@ -832,7 +832,7 @@ let SOLDE_MAX = Math.floor(soldeAfficheDepuisBrut(<?= (float)($wallet['solde'] ?
 // et le plafond utilisé par le bouton "Tous" / la validation suivent en direct.
 async function rafraichirSoldeRetrait(){
     try{
-        const res = await fetch("wallet/get_solde.php", { cache: "no-store" });
+        const res = await fetch("/wallet/get_solde.php", { cache: "no-store" });
         if(!res.ok) return;
         const data = await res.json();
         if(data.error) return;

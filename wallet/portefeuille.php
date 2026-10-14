@@ -4,7 +4,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 if (!isset($_SESSION['user_id'])) {
-    header("Location: ?page=dashboard");
+    header("Location: /?page=dashboard");
     exit;
 }
 
@@ -1519,7 +1519,7 @@ $coursCarte = $tauxAffiche > 0
 <!-- ÉCRAN DE BIENVENUE ANIMÉ (SPLASH SCREEN) -->
 <div id="splash-screen">
     <div class="splash-logo-container">
-        <img src="logousdtmvola.png" alt="Bienvenue" class="splash-logo">
+        <img src="/logousdtmvola.png" alt="Bienvenue" class="splash-logo">
     </div>
     <div class="splash-text">USDT Mvola</div>
     <div class="splash-loader"></div>
@@ -1577,7 +1577,7 @@ $coursCarte = $tauxAffiche > 0
                 </span>
                 <span data-fr="Dépôt USDT" data-en="USDT Deposit">Dépôt USDT</span>
             </button>
-            <a href="?page=retrait_mvola" class="action-btn">
+            <a href="/?page=retrait_mvola" class="action-btn">
                 <span class="action-icon retrait">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 1l4 4-4 4"></path><path d="M3 11V9a4 4 0 014-4h14"></path><path d="M7 23l-4-4 4-4"></path><path d="M21 13v2a4 4 0 01-4 4H3"></path></svg>
                 </span>
@@ -1640,7 +1640,7 @@ $coursCarte = $tauxAffiche > 0
         </div>
 
         <div class="wallet-actions">
-            <a href="?page=compte" class="wallet-btn wallet-btn-secondary" data-fr="Retour au compte" data-en="Back to account">Retour au compte</a>
+            <a href="/?page=compte" class="wallet-btn wallet-btn-secondary" data-fr="Retour au compte" data-en="Back to account">Retour au compte</a>
         </div>
 
     </div>
@@ -1791,7 +1791,7 @@ let dernierSolde = <?= (float)($wallet['solde'] ?? 0); ?>;
 
 async function rafraichirSolde(){
     try{
-        const res = await fetch("wallet/get_solde.php", { cache: "no-store" });
+        const res = await fetch("/wallet/get_solde.php", { cache: "no-store" });
         if(!res.ok) return;
         const data = await res.json();
         if(data.error) return;
@@ -1873,7 +1873,7 @@ async function chargerCourbeTaux(heures){
     const grille = document.getElementById('coursGridLines');
 
     try{
-        const res = await fetch('wallet/get_taux_historique.php?heures=' + courbeHeuresActuelles, { cache: 'no-store' });
+        const res = await fetch('/wallet/get_taux_historique.php?heures=' + courbeHeuresActuelles, { cache: 'no-store' });
         if(!res.ok) return;
         const data = await res.json();
         if(data.error || !Array.isArray(data.points) || data.points.length < 2){
@@ -2033,7 +2033,7 @@ async function actualiserValeurCours(){
     if(!el) return;
 
     try{
-        const res = await fetch('wallet/get_taux.php', { cache: 'no-store' });
+        const res = await fetch('/wallet/get_taux.php', { cache: 'no-store' });
         if(!res.ok) return;
         const data = await res.json();
         if(data.error || data.taux_client === undefined) return;
@@ -2051,7 +2051,7 @@ async function chargerTransactionsRecentes(){
     if(!conteneur) return;
 
     try{
-        const res = await fetch('wallet/historique.php', { cache: 'no-store' });
+        const res = await fetch('/wallet/historique.php', { cache: 'no-store' });
         const data = await res.json();
 
         if(data.error || !Array.isArray(data.historique)){
@@ -2278,7 +2278,7 @@ async function chargerHistorique(){
     if(corps) corps.innerHTML = '<div class="historique-chargement">Chargement...</div>';
 
     try{
-        const res = await fetch('wallet/historique.php', { cache: 'no-store' });
+        const res = await fetch('/wallet/historique.php', { cache: 'no-store' });
         const data = await res.json();
 
         if(data.error){
