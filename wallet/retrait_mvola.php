@@ -802,6 +802,12 @@ $solde_usdt = number_format(floor(soldeAfficheDepuisBrut((float)($wallet['solde'
     .lang-switch .lang-opt.active{background:linear-gradient(135deg,#0ea5a4,#22d3ee);color:#fff;box-shadow:0 6px 16px -8px rgba(14,165,164,.8);}
 
     button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--w-primary);outline-offset:2px;}
+
+    /* Conserve le rendu plein ecran "natif" sur mobile/webview (l'override
+       .card ci-dessus, place apres la media query, l'ecraserait sinon). */
+    @media (max-width:768px){
+        .card{max-width:100%;width:100%;border-radius:0;box-shadow:none;}
+    }
     </style>
 </head>
 <body>
