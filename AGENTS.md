@@ -254,6 +254,13 @@ Une couche de compatibilite permet de tourner sur PostgreSQL sans modifier les
   (fond, carte blanche sans bordure animee, balance teal lumineux, actions,
   cours USDT, reseaux/adresses, bottom-nav, modales historique, selecteur de
   langue). `<meta name="theme-color">` passe a `#f2f5fa`.
+- `wallet/retrait_mvola.php` : meme approche. Le style d'origine etait SOMBRE
+  (fond image `deblocagetango.com/tango3.jpg`, glass, bordure animee, or/rose) ;
+  un bloc final « Theme clair Fintech » (memes jetons `--w-*`) le convertit en
+  clair et le rend coherent avec le portefeuille. La media query mobile qui
+  remet la carte en plein ecran est repetee APRES ce bloc (sinon l'override
+  `.card` la ecrase). Focus `:focus-visible` accessible et
+  `prefers-reduced-motion` respecte sur les deux pages.
 - Palette : teal/cyan pour les actions, indigo en accent, vert pour les valeurs
   positives et les depots, rouge pour les erreurs. Plus de rose `#ff2ea6`.
 
