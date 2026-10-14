@@ -6,32 +6,63 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.webkit.CookieManager;
+import android.webkit.DownloadListener;
+import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.splashscreen.SplashScreen;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
+import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.button.MaterialButton;
 
 /**
- * Affiche directement le portefeuille de l'utilisateur (wallet/portefeuille.php)
- * dans une WebView. L'URL de base de l'hébergement est configurable.
+ * Affiche le portefeuille de l'utilisateur (wallet/portefeuille.php) dans une
+ * WebView. Splash natif, pull-to-refresh, barre de progression, ecran d'erreur
+ * avec reessai, telechargements et liens externes geres par le systeme.
  */
 public class MainActivity extends AppCompatActivity {
 
     private WebView webView;
+    private SwipeRefreshLayout swipeRefresh;
+    private ProgressBar progressBar;
+    private View errorView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Splash natif (doit precede super.onCreate).
+        SplashScreen.installSplashScreen(this);
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
-        webView = new WebView(this);
-        setContentView(webView);
+        MaterialToolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        webView = findViewById(R.id.webView);
+        swipeRefresh = findViewById(R.id.swipeRefresh);
+        progressBar = findViewById(R.id.progressBar);
+        errorView = findViewById(R.id.errorView);
+        MaterialButton btnRetry = findViewById(R.id.btnRetry);
+
+        swipeRefresh.setColorSchemeResources(R.color.wallet_primary);
+        swipeRefresh.setOnRefreshListener(() -> {
+            errorView.setVisibility(View.GONE);
+            webView.reload();
+        });
+        btnRetry.setOnClickListener(v -> {
+            errorView.setVisibility(View.GONE);
+            loadPortefeuille();
+        });
 
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
@@ -39,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
         settings.setLoadWithOverviewMode(true);
         settings.setUseWideViewPort(true);
         settings.setBuiltInZoomControls(false);
-        settings.setUserAgentString(settings.getUserAgentString() + " MonAppAndroid/1.1");
+        settings.setUserAgentString(settings.getUserAgentString() + " MonAppAndroid/1.2");
 
         CookieManager.getInstance().setAcceptCookie(true);
         CookieManager.getInstance().setAcceptThirdPartyCookies(webView, true);
@@ -53,6 +84,38 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 super.onPageStarted(view, url, favicon);
+                progressBar.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                progressBar.setVisibility(View.GONE);
+                swipeRefresh.setRefreshing(false);
+            }
+
+            @Override
+            public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+                super.onReceivedError(view, request, error);
+                // Seule l'erreur de la ressource principale declenche l'ecran d'erreur.
+                if (request.isForMainFrame()) {
+                    progressBar.setVisibility(View.GONE);
+                    swipeRefresh.setRefreshing(false);
+                    errorView.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
+        // Ouvre les fichiers telecharges (APK, PDF...) avec le gestionnaire systeme.
+        webView.setDownloadListener(new DownloadListener() {
+            @Override
+            public void onDownloadStart(String url, String userAgent, String contentDisposition,
+                                        String mimeType, long contentLength) {
+                try {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+                } catch (Exception e) {
+                    Toast.makeText(MainActivity.this, "Impossible d'ouvrir le lien", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -72,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Ouvre les liens externes (mailto, tel, autres domaines) dans l'application
-     * système ; garde la navigation interne dans la WebView.
+     * systeme ; garde la navigation interne dans la WebView.
      */
     private boolean handleExternal(Uri uri) {
         String scheme = uri.getScheme() == null ? "" : uri.getScheme();
@@ -109,15 +172,6 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK && webView.canGoBack()) {
-            webView.goBack();
-            return true;
-        }
-        return super.onKeyDown(keyCode, event);
     }
 
     @SuppressLint("SetJavaScriptEnabled")

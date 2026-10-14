@@ -332,3 +332,25 @@ Une couche de compatibilite permet de tourner sur PostgreSQL sans modifier les
   Puis suivre `.../deploys/<id>` jusqu'a `status=live`.
 - Rappel : le service gratuit s'endort apres 15 min d'inactivite (1er appel lent).
 
+
+## Application Android (android-app/)
+- Wrapper WebView Java (pas de Kotlin/Compose) chargeant
+  `<base>/wallet/portefeuille.php` ; enveloppe native Material 3 (splash,
+  pull-to-refresh, ecran hors-ligne, icone adaptative).
+- Package `com.tango.wallet`, minSdk 24, target/compileSdk 34, AGP 8.5.2.
+- Toolchain dans l'environnement OpenHands (a reinstaller si reset) :
+  `openjdk-21-jdk-headless`, `librsvg2-bin`, Android cmdline-tools +
+  `platforms;android-34` + `build-tools;34.0.0` dans `/home/openhands/android-sdk`,
+  Gradle 8.9 dans `/opt/gradle-8.9`.
+- Build signe (les mots de passe keystore viennent de l'env) :
+  ```bash
+  export TANGO_KEYSTORE_PASSWORD=... TANGO_KEY_PASSWORD=...
+  gradle :app:assembleRelease :app:bundleRelease   # APK + AAB
+  ```
+- Artefact servi par l'app web : `downloads/tango-wallet.apk` (route
+  `?download=apk`) ; AAB pour Play Store : `downloads/tango-wallet-v1.2.0.aab`.
+- Icones legacy regenerees depuis `/tmp/icon.svg` via `rsvg-convert` (le SVG
+  source doit etre recree si besoin) ; icone adaptative = `mipmap-anydpi-v26`.
+- `usesCleartextTraffic=false` : le HTTP en clair n'est tolere que pour
+  localhost/127.0.0.1/10.0.2.2 (`network_security_config.xml`).
+

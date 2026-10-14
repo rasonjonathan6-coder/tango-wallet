@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Meme theme clair en mode nuit : l'app applique son propre fond clair,
+         on evite donc une bascule sombre surprise du systeme. -->
+    <style name="Theme.Wallet" parent="Theme.Material3.Light.NoActionBar">
+        <item name="colorPrimary">#0EA5A4</item>
+        <item name="colorPrimaryDark">#0B7D7C</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorSecondary">#6366F1</item>
+        <item name="colorSurface">#FFFFFF</item>
+        <item name="colorSurfaceVariant">#F2F5FA</item>
+        <item name="colorOnSurface">#0E1729</item>
+        <item name="android:colorBackground">#F2F5FA</item>
+        <item name="android:statusBarColor">#F2F5FA</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+</resources>

@@ -1,11 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- DarkActionBar (et non NoActionBar) : la barre d'action expose le menu
-         overflow (Actualiser / Changer d'hebergement). Sans elle, le menu
-         etait invisible et l'utilisateur ne pouvait pas corriger l'URL. -->
-    <style name="Theme.Wallet" parent="Theme.AppCompat.DayNight.DarkActionBar">
-        <item name="colorPrimary">#0F2C4C</item>
-        <item name="colorPrimaryDark">#0A2038</item>
-        <item name="colorAccent">#F0B429</item>
+    <!-- Theme clair « Fintech » : Material 3 (MaterialComponents) aligne sur le
+         portefeuille web (canvas lumineux, accent teal). LightActionBar (et non
+         NoActionBar) : la barre expose le menu overflow (Actualiser / Hebergement). -->
+    <style name="Theme.Wallet" parent="Theme.Material3.Light.NoActionBar">
+        <item name="colorPrimary">#0EA5A4</item>
+        <item name="colorPrimaryDark">#0B7D7C</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorSecondary">#6366F1</item>
+        <item name="colorSurface">#FFFFFF</item>
+        <item name="colorSurfaceVariant">#F2F5FA</item>
+        <item name="colorOnSurface">#0E1729</item>
+        <item name="android:colorBackground">#F2F5FA</item>
+        <item name="android:statusBarColor">#F2F5FA</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+
+    <!-- Splash natif (androidx.core:core-splashscreen) : logo centre sur fond clair. -->
+    <style name="Theme.Wallet.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">#F2F5FA</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+        <item name="postSplashScreenTheme">@style/Theme.Wallet</item>
     </style>
 </resources>

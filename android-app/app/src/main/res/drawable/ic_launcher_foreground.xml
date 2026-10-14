@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Avant-plan de l'icone : piece « ₮ » (Tether) stylisee, blanche sur fond teal.
+     Dessin centre dans la safe-zone (66dp) de l'icone adaptative. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Anneau de la piece -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="5"
+        android:fillColor="#00000000"
+        android:pathData="M24,54 a30,30 0 1,0 60,0 a30,30 0 1,0 -60,0 z" />
+    <!-- Barre horizontale du T -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M39,41 h30 v7 h-30 z" />
+    <!-- Hampe verticale du T -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M50.5,41 h7 v31 h-7 z" />
+    <!-- Double barre du symbole ₮ -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M45,52 h18 v3 h-18 z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M45,59 h18 v3 h-18 z" />
+</vector>

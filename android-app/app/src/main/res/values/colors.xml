@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="wallet_bg">#F2F5FA</color>
+    <color name="wallet_primary">#0EA5A4</color>
+    <color name="wallet_ink">#0E1729</color>
+    <color name="wallet_muted">#5B6B88</color>
+</resources>

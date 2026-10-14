@@ -6,5 +6,11 @@
     <string name="menu_settings">Changer d\'hébergement</string>
     <string name="settings_saved">Hébergement enregistré</string>
     <string name="settings_hint">URL de base (ex: https://mon-domaine.com)</string>
+    <string name="settings_subtitle">Adresse du service à charger dans l\'application.</string>
     <string name="settings_save">Enregistrer</string>
+
+    <!-- États réseau / chargement -->
+    <string name="error_title">Connexion impossible</string>
+    <string name="error_message">Impossible de joindre le service. Vérifie ta connexion internet puis réessaie.</string>
+    <string name="error_retry">Réessayer</string>
 </resources>
