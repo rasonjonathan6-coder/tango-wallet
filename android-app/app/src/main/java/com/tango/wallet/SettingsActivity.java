@@ -17,9 +17,9 @@ public class SettingsActivity extends AppCompatActivity {
     public static final String PREFS = "wallet_prefs";
     public static final String KEY_URL = "base_url";
 
-    // Hébergement par défaut de l'application.
+    // Hébergement par défaut de l'application (production).
     public static final String DEFAULT_URL =
-            "https://work-2-cheyxecpzltibrus.prod-runtime.all-hands.dev";
+            "https://tango-wallet.onrender.com";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

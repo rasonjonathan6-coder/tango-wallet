@@ -108,6 +108,27 @@ if (isset($_GET['logout'])) {
     redirect('?page=dashboard');
 }
 
+// ================= TELECHARGEMENT DE L'APK =================
+// Sert l'APK depuis downloads/ avec le bon type MIME et en piece jointe,
+// afin que le lien de mise a jour fonctionne sans dependre d'un hebergement
+// externe. Le nom de fichier est fige (pas de parametre utilisateur) : aucune
+// traversee de chemin possible.
+if (isset($_GET['download']) && $_GET['download'] === 'apk') {
+    $apk = __DIR__ . '/downloads/tango-wallet.apk';
+    if (is_file($apk)) {
+        header('Content-Type: application/vnd.android.package-archive');
+        header('Content-Disposition: attachment; filename="tango-wallet.apk"');
+        header('Content-Length: ' . filesize($apk));
+        header('Cache-Control: no-store');
+        readfile($apk);
+    } else {
+        http_response_code(404);
+        header('Content-Type: text/plain; charset=utf-8');
+        echo 'APK indisponible';
+    }
+    exit;
+}
+
 // ================= VERROU GLOBAL ADMIN (MODE WEB) =================
 if (isset($_POST['login_admin'])) {
     if (hash_equals((string) $mot_de_passe_admin, (string) ($_POST['admin_pwd'] ?? ''))) {

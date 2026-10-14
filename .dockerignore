@@ -3,12 +3,10 @@
 .agents
 .github
 android-app
-downloads
 tests
 docs
 home_visual_review
 *.zip
-*.apk
 .env
 *.env.sh
 *.md

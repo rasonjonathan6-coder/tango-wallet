@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
         settings.setLoadWithOverviewMode(true);
         settings.setUseWideViewPort(true);
         settings.setBuiltInZoomControls(false);
-        settings.setUserAgentString(settings.getUserAgentString() + " MonAppAndroid/1.0");
+        settings.setUserAgentString(settings.getUserAgentString() + " MonAppAndroid/1.1");
 
         CookieManager.getInstance().setAcceptCookie(true);
         CookieManager.getInstance().setAcceptThirdPartyCookies(webView, true);

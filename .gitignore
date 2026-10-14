@@ -4,6 +4,7 @@
 
 # APK compilé (artefact de build)
 *.apk
+!downloads/*.apk
 
 # Logs applicatifs
 wallet-mails.log
@@ -18,3 +19,9 @@ Thumbs.db
 local.properties
 .gradle/
 build/
+
+# Keystore de signature APK (secret)
+android-app/keystore/
+*.jks
+*.keystore
+android-app/local.properties
